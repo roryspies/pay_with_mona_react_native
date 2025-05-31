@@ -159,13 +159,11 @@ export const PayWithMonaCollectionsProvider = ({
         onSubmit={createCollectionConsentRequest}
       />
 
-      {collectionState.deviceAuth && collectionState.sessionId && (
-        <KeyExchangeConfirmationModal
-          loading={loadingState.keyExchange}
-          ref={keyExchangeModalRef}
-          onSubmit={signAndCommitKeys}
-        />
-      )}
+      <KeyExchangeConfirmationModal
+        loading={loadingState.keyExchange}
+        ref={keyExchangeModalRef}
+        onSubmit={signAndCommitKeys}
+      />
     </PayMonaCollectionsContext.Provider>
   );
 };
