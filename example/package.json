@@ -10,9 +10,14 @@
     "build:ios": "react-native build-ios --scheme PayWithMonaReactNativeExample --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\""
   },
   "dependencies": {
+    "@react-native-cookies/cookies": "^6.2.1",
     "iconsax-react-native": "^0.0.8",
+    "pay-with-mona-react-native": "file:../",
     "react": "19.0.0",
-    "react-native": "^0.78.2",
+    "react-native": "^0.79.2",
+    "react-native-biometrics": "^3.0.1",
+    "react-native-custom-tabs": "https://github.com/cscoderr/react-native-custom-tabs.git",
+    "react-native-mmkv": "^3.2.0",
     "react-native-svg": "^15.11.2"
   },
   "devDependencies": {
