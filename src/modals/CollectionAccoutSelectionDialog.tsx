@@ -74,19 +74,31 @@ const CollectionAccountSelectionDialog = forwardRef(
             to NGdeals for repayments.
           </Text>
           {savedPaymentOptions?.bank != null &&
-            savedPaymentOptions?.bank.map((value) => (
-              <View key={value.bankId}>
-                <BankOptionsTile
-                  bank={value}
-                  isSelected={value.bankId === bank?.bankId}
-                  paymentMethod={PaymentMethod.SAVEDBANK}
-                  onPress={() => {
-                    setBank(value);
-                  }}
-                />
-                <SizedBox height={20} />
-              </View>
-            ))}
+            savedPaymentOptions?.bank.map((value) => {
+              //TODO! Alert them on backend to creeat an endpoint specific to collection
+              //Implemented based on what they have Flutter
+              if (
+                value.bankName!.toLowerCase().includes('opay') ||
+                value.bankName!.toLowerCase().includes('palm') ||
+                value.bankName!.toLowerCase().includes('kuda') ||
+                value.bankName!.toLowerCase().includes('monie')
+              ) {
+                return <View />;
+              }
+              return (
+                <View key={value.bankId}>
+                  <BankOptionsTile
+                    bank={value}
+                    isSelected={value.bankId === bank?.bankId}
+                    paymentMethod={PaymentMethod.SAVEDBANK}
+                    onPress={() => {
+                      setBank(value);
+                    }}
+                  />
+                  <SizedBox height={20} />
+                </View>
+              );
+            })}
           <SizedBox height={10} />
           <Pressable
             onPress={() => {}}
