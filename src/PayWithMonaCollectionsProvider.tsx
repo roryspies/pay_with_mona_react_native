@@ -127,7 +127,10 @@ export const PayWithMonaCollectionsProvider = ({
   const createCollectionConsentRequest = useCallback(
     async (value: BankOptions) => {
       handleSetState(setLoadingState, { collectionConsent: true });
+      //
       setBank(value);
+      console.log(bank);
+
       try {
         await collectionService.createCollectionConsentRequest({
           bankId: value.bankId,
