@@ -10,14 +10,23 @@
     "build:ios": "react-native build-ios --scheme PayWithMonaReactNativeExample --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\""
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-community/datetimepicker": "^8.3.0",
     "@react-native-cookies/cookies": "^6.2.1",
+    "@react-navigation/native": "^7.1.8",
+    "@react-navigation/native-stack": "^7.3.12",
     "iconsax-react-native": "^0.0.8",
     "pay-with-mona-react-native": "file:../",
     "react": "19.0.0",
     "react-native": "^0.79.2",
     "react-native-biometrics": "^3.0.1",
     "react-native-custom-tabs": "https://github.com/cscoderr/react-native-custom-tabs.git",
+    "react-native-date-picker": "^5.0.12",
+    "react-native-element-dropdown": "^2.12.4",
     "react-native-mmkv": "^3.2.0",
+    "react-native-modal": "^14.0.0-rc.1",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "^4.10.0",
     "react-native-svg": "^15.11.2"
   },
   "devDependencies": {

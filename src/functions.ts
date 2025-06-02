@@ -30,7 +30,7 @@ export const validatePII = async ({
   lastName?: string | null;
   middleName?: string | null;
 }): Promise<PIIResponse | null> => {
-  const response = await paymentServices.validatePII({
+  return await paymentServices.validatePII({
     phoneNumber,
     bvn,
     dob,
@@ -38,5 +38,4 @@ export const validatePII = async ({
     lastName,
     middleName,
   });
-  return response;
 };

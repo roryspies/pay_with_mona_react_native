@@ -2,14 +2,17 @@ import { PAYMENT_BASE_URL } from './config';
 import { Dimensions } from 'react-native';
 import ReactNativeCustomTabs, {
   CustomTabsActivityHeightResizeBehavior,
+  CustomTabsActivitySideSheetDecorationType,
+  CustomTabsActivitySideSheetRoundedCornersPosition,
   CustomTabsShareState,
+  SafariViewControllerDismissButtonStyle,
   SheetPresentationControllerDetent,
   ViewControllerModalPresentationStyle,
 } from 'react-native-custom-tabs';
 import { MMKV } from 'react-native-mmkv';
 import type { SavedPaymentOptions } from '../types';
-import dayjs from 'dayjs';
 import { PaymentMethod } from './enums';
+import React from 'react';
 
 export const generateSessionId = (length = 10): string => {
   const chars =
@@ -31,33 +34,15 @@ export function handleSetState<T>(
   setState((prev) => ({ ...prev, ...update }));
 }
 
-// const getPaymentUrl = (
-//   transactionId: string,
-//   sessionId: string,
-//   paymentMethod?: string
-// ): string => {
-//   const storage = new MMKV();
-//   const monaCheckoutID = storage.getString('monaCheckoutID');
-
-//   const redirectUrl = `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${paymentMethod}`;
-
-//   if (monaCheckoutID && monaCheckoutID !== undefined) {
-//     return redirectUrl;
-//   }
-//   console.log(sessionId);
-
-//   return `${PAYMENT_BASE_URL}/login?loginScope=
-//         67e41f884126830aded0b43c&redirect=${encodeURIComponent(
-//           redirectUrl
-//         )}&sessionId=${sessionId}&transactionId=${transactionId}`;
-// };
-
 /**
  * Generate a signin URL for in-app browser authentication
  * @param transactionId - Transaction identifier
  * @param sessionId - Session identifier
  * @param paymentMethod - Selected payment method
  * @param bankId - Optional bank identifier
+ * @param isAuthenticated
+ * @param isCollection
+ * @param merchantKey
  * @returns Fully formed URL
  */
 export const buildSdkUrl = ({
@@ -83,22 +68,18 @@ export const buildSdkUrl = ({
   if (isCollection) {
     return `${PAYMENT_BASE_URL}/collections?loginScope=${merchantKey}&sessionId=${sessionId}`;
   }
-  const redirectUrl = `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${methodParam}&bankId=${bankId || ''}`;
+
+  // const url =
+  //   'https://pay.development.mona.ng/collections/enrollment?collectionId=$collectionId';
 
   if (
     isAuthenticated ||
     paymentMethod === PaymentMethod.TRANSFER ||
     paymentMethod === PaymentMethod.CARD
   ) {
-    console.log(
-      `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${paymentMethod}&loginScope=${merchantKey}&sessionId=${sessionId}`
-    );
-
     return `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${paymentMethod}&loginScope=${merchantKey}&sessionId=${sessionId}`;
   }
-  console.log(
-    `${PAYMENT_BASE_URL}/login?loginScope=${merchantKey}&redirect=${encodeURIComponent(redirectUrl)}&sessionId=${sessionId}`
-  );
+  const redirectUrl = `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${methodParam}&bankId=${bankId || ''}`;
 
   return `${PAYMENT_BASE_URL}/login?loginScope=${merchantKey}&redirect=${encodeURIComponent(redirectUrl)}&sessionId=${sessionId}`;
 };
@@ -122,36 +103,32 @@ export const launchSdkUrl = async (url: string): Promise<void> => {
     await ReactNativeCustomTabs.launch(url, {
       customTabsOptions: {
         shareState: CustomTabsShareState.off,
+        showTitle: true,
         partial: {
-          initialHeight: Dimensions.get('window').height * 0.97,
+          initialHeight: Dimensions.get('window').height * 0.9,
           activityHeightResizeBehavior:
             CustomTabsActivityHeightResizeBehavior.fixed,
+          activitySideSheetMaximizationEnabled: true,
+          activitySideSheetDecorationType:
+            CustomTabsActivitySideSheetDecorationType.shadow,
+          activitySideSheetRoundedCornersPosition: CustomTabsActivitySideSheetRoundedCornersPosition.top,
+          cornerRadius: 16,
         },
       },
       safariVCOptions: {
         modalPresentationStyle: ViewControllerModalPresentationStyle.pageSheet,
+        dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
         pageSheet: {
           detents: [SheetPresentationControllerDetent.large],
           preferredCornerRadius: 16,
+          prefersGrabberVisible: true,
         },
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
-
-export function parseToISOString(input: string | Date): string | null {
-  if (input instanceof Date) {
-    return isNaN(input.getTime()) ? null : input.toISOString();
-  }
-  const parsed = dayjs(input);
-  if (!parsed.isValid()) {
-    console.log('[parseToISOString] Invalid date input:', input);
-    return null;
-  }
-  return parsed.toISOString();
-}
 
 export const generateRequestCurl = (
   url: string,
