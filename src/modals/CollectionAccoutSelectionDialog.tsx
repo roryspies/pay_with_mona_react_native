@@ -13,8 +13,8 @@ import {
   useState,
   type ForwardedRef,
 } from 'react';
-import TextButton from '../components/TextButton';
 import Row from '../components/Row';
+import { launchSdkUrl } from '../utils/helpers';
 
 const CollectionAccountSelectionDialog = forwardRef(
   (
@@ -22,9 +22,11 @@ const CollectionAccountSelectionDialog = forwardRef(
       loading,
       savedPaymentOptions,
       onSubmit,
+      accessRequestId,
     }: {
       loading: boolean;
       savedPaymentOptions: SavedPaymentOptions | null;
+      accessRequestId: string;
       onSubmit?: (bank: BankOptions) => void;
     },
     ref: ForwardedRef<ModalType>
@@ -101,7 +103,10 @@ const CollectionAccountSelectionDialog = forwardRef(
             })}
           <SizedBox height={10} />
           <Pressable
-            onPress={() => {}}
+            onPress={async () => {
+              const url = `https://pay.development.mona.ng/collections/enrollment?collectionId=${accessRequestId}`;
+              await launchSdkUrl(url);
+            }}
             style={{
               padding: 20,
               // flex: 1,

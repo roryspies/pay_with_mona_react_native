@@ -111,7 +111,8 @@ export const launchSdkUrl = async (url: string): Promise<void> => {
           activitySideSheetMaximizationEnabled: true,
           activitySideSheetDecorationType:
             CustomTabsActivitySideSheetDecorationType.shadow,
-          activitySideSheetRoundedCornersPosition: CustomTabsActivitySideSheetRoundedCornersPosition.top,
+          activitySideSheetRoundedCornersPosition:
+            CustomTabsActivitySideSheetRoundedCornersPosition.top,
           cornerRadius: 16,
         },
       },
