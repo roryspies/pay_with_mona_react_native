@@ -4,7 +4,7 @@ import PayWithMona from './PayWithMona';
 import { initialize, validatePII } from './functions';
 import { isAuthenticated, signOut } from './utils/helpers';
 import MonaModal from './modals/MonaModal';
-import BankTile from './components/BankTile';
+import BankOptionsTile from './components/BankOptionsTile';
 
 export const PayWithMonaSDK = {
   initialize,
@@ -18,7 +18,7 @@ export {
   PayWithMonaCollectionsProvider,
   useCollections,
   MonaModal,
-  BankTile,
+  BankOptionsTile as BankTile,
 };
 export * from './types';
 export * from './utils/enums';

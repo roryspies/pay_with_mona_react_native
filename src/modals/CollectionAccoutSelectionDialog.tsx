@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import MonaModal from './MonaModal';
 import MonaButton from '../components/MonaButton';
 import CircularAvatar from '../components/CircularAvatar';
 import { MonaColors } from '../utils/config';
 import SizedBox from '../components/SizedBox';
 import type { BankOptions, ModalType, SavedPaymentOptions } from '../types';
-import BankTile from '../components/BankTile';
+import BankOptionsTile from '../components/BankOptionsTile';
 import { PaymentMethod } from '../utils/enums';
 import {
   forwardRef,
@@ -13,6 +13,8 @@ import {
   useState,
   type ForwardedRef,
 } from 'react';
+import TextButton from '../components/TextButton';
+import Row from '../components/Row';
 
 const CollectionAccountSelectionDialog = forwardRef(
   (
@@ -74,7 +76,7 @@ const CollectionAccountSelectionDialog = forwardRef(
           {savedPaymentOptions?.bank != null &&
             savedPaymentOptions?.bank.map((value) => (
               <View key={value.bankId}>
-                <BankTile
+                <BankOptionsTile
                   bank={value}
                   isSelected={value.bankId === bank?.bankId}
                   paymentMethod={PaymentMethod.SAVEDBANK}
@@ -85,6 +87,24 @@ const CollectionAccountSelectionDialog = forwardRef(
                 <SizedBox height={20} />
               </View>
             ))}
+          <SizedBox height={10} />
+          <Pressable
+            onPress={() => {}}
+            style={{
+              padding: 20,
+              // flex: 1,
+            }}
+          >
+            <Row style={{ flex: 0 }}>
+              <Image
+                source={require('../assets/add.png')}
+                height={20}
+                width={20}
+              />
+
+              <Text style={styles.textButtonText}>Add Account</Text>
+            </Row>
+          </Pressable>
           <SizedBox height={10} />
           <MonaButton
             style={styles.button}
@@ -141,6 +161,15 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     resizeMode: 'contain',
+  },
+  textButtonText: {
+    // flex: 1,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    fontSize: 14,
+    paddingVertical: 20,
+    fontWeight: '500',
+    fontFamily: 'GeneralSans-Medium',
   },
   headerContainer: {
     flexDirection: 'row',

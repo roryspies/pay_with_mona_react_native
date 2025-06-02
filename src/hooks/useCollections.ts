@@ -6,7 +6,13 @@ import { ApiError } from '../services/ApiService';
 import { FirebaseSSE } from '../services/FirebaseSSEStream';
 import ReactNativeCustomTabs from 'react-native-custom-tabs';
 
-const useCollections = ({ onDone }: { onDone?: () => void }) => {
+const useCollections = ({
+  onSuccess,
+  onError,
+}: {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}) => {
   const { showModal, onHandleAuthUpdate } = usePayWithMonaCollections();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -25,7 +31,10 @@ const useCollections = ({ onDone }: { onDone?: () => void }) => {
               await onHandleAuthUpdate(token, sessionId);
             }
           },
-          onError: (err) => console.log('🔥 SSE Error:', err),
+          onError: (err) => {
+            onError?.(err);
+            console.log('🔥 SSE Error:', err);
+          },
         });
 
         const hasKey = await collectionService.initCollection({
@@ -33,18 +42,20 @@ const useCollections = ({ onDone }: { onDone?: () => void }) => {
         });
 
         if (!hasKey) return;
-        showModal(accessRequestId, onDone);
+        showModal(accessRequestId, onSuccess);
       } catch (e) {
         if (e instanceof ApiError) {
           setError(e.message);
+          onError?.(Error(e.message));
         } else {
-          setError('An error occur');
+          setError('An error occurred');
+          onError?.(e as Error);
         }
       } finally {
         setLoading(false);
       }
     },
-    [onHandleAuthUpdate, showModal, onDone]
+    [onHandleAuthUpdate, showModal, onSuccess]
   );
   return { error, loading, initiate };
 };

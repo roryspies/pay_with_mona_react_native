@@ -79,9 +79,10 @@ const CollectionScreen = () => {
 
   const { initiate: initiateCollection, loading: collectionLoading } =
     useCollections({
-      onDone: () => {
+      onSuccess: () => {
         setShowSuccess(true);
       },
+      onError: () => {},
     });
 
   const [scheduledFormData, setScheduledFormData] = useState<ScheduledFormData>(
