@@ -107,16 +107,11 @@ const CollectionAccountSelectionDialog = forwardRef(
               const url = `https://pay.development.mona.ng/collections/enrollment?collectionId=${accessRequestId}`;
               await launchSdkUrl(url);
             }}
-            style={{
-              padding: 20,
-              // flex: 1,
-            }}
           >
             <Row style={{ flex: 0 }}>
               <Image
                 source={require('../assets/add.png')}
-                height={20}
-                width={20}
+                style={{ width: 20, height: 20 }}
               />
 
               <Text style={styles.textButtonText}>Add Account</Text>
