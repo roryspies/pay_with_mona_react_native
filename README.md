@@ -30,6 +30,7 @@ import { PayWithMona, type TransactionStatus } from 'pay-with-mona-react-native'
     merchantKey={MERCHANT_PUBLIC_KEY}
     amount={AMOUNT_IN_KOBO}
     transactionId={TRANSACTION_ID}
+    savedBankOptions={}
     onTransactionUpdate={(status: TransactionStatus) => {}}
 />
 ```

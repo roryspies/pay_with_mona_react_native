@@ -3,7 +3,7 @@ import MonaModal from './MonaModal';
 import MonaButton from '../components/MonaButton';
 import { MonaColors } from '../utils/config';
 import type { BankOptions } from '../types';
-import BankTile from '../components/BankTile';
+import BankOptionsTile from '../components/BankOptionsTile';
 import SizedBox from '../components/SizedBox';
 
 const TransactionConfirmationModal = ({
@@ -35,7 +35,7 @@ const TransactionConfirmationModal = ({
         <Text style={styles.amount}>₦{amount}</Text>
       </View>
       <Text style={styles.title}>Payment Method</Text>
-      <BankTile
+      <BankOptionsTile
         bank={bank}
         onPress={() => onChange?.()}
         trailing={

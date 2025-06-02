@@ -96,6 +96,7 @@ export interface PayWithMonaProps {
   transactionId: string;
   savedPaymentOptions?: SavedPaymentOptions;
   onTransactionUpdate?: (status: TransactionStatus) => void;
+  onError?: (error: Error) => void;
   onAuthUpdate?: () => void;
 }
 
@@ -236,7 +237,11 @@ export interface PII {
 }
 
 export interface PayWithMonaCollectionsContextType {
-  showModal: (requestId: string, onDone?: () => void) => void;
+  showModal: (
+    requestId: string,
+    onSuccess?: () => void,
+    onError?: () => void
+  ) => void;
   onHandleAuthUpdate: (token: any, sessionId: string) => void;
   hideModal: () => void;
 }

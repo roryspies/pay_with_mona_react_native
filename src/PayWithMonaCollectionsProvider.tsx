@@ -32,6 +32,7 @@ type CollectionState = {
   sessionId: string | null;
   bank: BankOptions | null;
 };
+
 export const PayWithMonaCollectionsProvider = ({
   children,
   merchantKey,
@@ -40,7 +41,8 @@ export const PayWithMonaCollectionsProvider = ({
   merchantKey: string;
 }) => {
   const [requestId, setRequestId] = useState<string>('');
-  const onDoneRef = useRef<(() => void) | null>(null);
+  const onSuccessRef = useRef<(() => void) | null>(null);
+  const onErrorRef = useRef<((error: Error) => void) | null>(null);
   const keyExchangeModalRef = useRef<ModalType>(null);
   const collectionAccountModalRef = useRef<ModalType>(null);
   const {
@@ -50,8 +52,13 @@ export const PayWithMonaCollectionsProvider = ({
   } = useValidatePII();
 
   const showModal = useCallback(
-    (propsRequestId: string, onDone?: () => void) => {
-      onDoneRef.current = onDone || null;
+    (
+      propsRequestId: string,
+      onSuccess?: () => void,
+      onError?: (error: Error) => void
+    ) => {
+      onSuccessRef.current = onSuccess || null;
+      onErrorRef.current = onError || null;
       setRequestId(propsRequestId);
       validatePII();
       collectionAccountModalRef?.current?.open();
@@ -69,7 +76,6 @@ export const PayWithMonaCollectionsProvider = ({
     keyExchange: false,
   });
   const [bank, setBank] = useState<BankOptions>();
-  console.log(bank);
   const [collectionState, setCollectionState] = useState<CollectionState>({
     deviceAuth: null,
     sessionId: null,
@@ -91,6 +97,7 @@ export const PayWithMonaCollectionsProvider = ({
         });
       } catch (error) {
         console.log('🔥 SSE Error:', error);
+        onErrorRef.current?.(error as Error);
       } finally {
         handleSetState(setLoadingState, { main: false });
       }
@@ -111,6 +118,7 @@ export const PayWithMonaCollectionsProvider = ({
       collectionAccountModalRef?.current?.open();
     } catch (error) {
       console.log('🔥 SSE Error:', error);
+      onErrorRef.current?.(error as Error);
     } finally {
       handleSetState(setLoadingState, { keyExchange: false });
     }
@@ -125,9 +133,10 @@ export const PayWithMonaCollectionsProvider = ({
           bankId: value.bankId,
           accessRequestId: requestId,
         });
-        onDoneRef.current?.();
+        onSuccessRef.current?.();
       } catch (e) {
         console.log('Create collection error', e);
+        onErrorRef.current?.(e as Error);
       } finally {
         handleSetState(setLoadingState, { collectionConsent: false });
         collectionAccountModalRef?.current?.close();

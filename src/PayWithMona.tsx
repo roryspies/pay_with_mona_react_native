@@ -10,8 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import PaymentMethodTile from './components/PaymentTile';
-import BankTile from './components/BankTile';
+import BankOptionsTile from './components/BankOptionsTile';
 import { PaymentMethod, TransactionStatus } from './utils/enums';
 import { styles } from './styles';
 import {
@@ -63,6 +62,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   transactionId,
   onTransactionUpdate,
   savedPaymentOptions,
+  onError,
   onAuthUpdate,
 }) => {
   const keyExchangeModalRef = useRef<ModalType>(null);
@@ -148,6 +148,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
   const { initialize: initializePayment } = useInitializePayment({
     transactionId,
+    onError: onError,
     onPaymentUpdate: (event) => {
       if (!event.data.event) {
         return;
@@ -183,6 +184,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         keyExchangeModalRef.current?.open();
       } catch (error) {
         console.log('🔥 SSE Error:', error);
+        onError?.(error as Error);
       } finally {
         handleSetLoadingState('main', false);
       }
@@ -208,6 +210,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       handleSetLoadingState('main', false);
     } catch (error) {
       console.log('🔥 SSE Error:', error);
+      onError?.(error as Error);
     } finally {
       handleSetLoadingState('setup', false);
       handleSetLoadingState('main', false);
@@ -228,6 +231,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       handleSetLoadingState('retry', false);
     } catch (e) {
       handleSetLoadingState('retry', false);
+      onError?.(e as Error);
     }
   }, [
     handleSetLoadingState,
@@ -253,7 +257,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   });
 
   useEffect(() => {
-    console.log('initiating!!!!');
     validatePII();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -283,61 +286,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       handleSetPaymentState({ paymentOptions: savedPaymentOptions });
     }
   }, [piiData, handleSetPaymentState, savedPaymentOptions]);
-
-  const renderSavedPaymentOptions = useCallback(() => {
-    return (
-      <>
-        {paymentState.paymentOptions != null &&
-          paymentState.paymentOptions.card?.map((bank) => (
-            <React.Fragment key={bank.bankId}>
-              <BankTile
-                bank={bank}
-                isSelected={
-                  paymentState.paymentMethod === PaymentMethod.SAVEDCARD &&
-                  paymentState.bankId === bank.bankId
-                }
-                paymentMethod={PaymentMethod.SAVEDCARD}
-                onPress={() => {
-                  handleSetPaymentState({
-                    bankId: bank.bankId,
-                    bankOptions: bank,
-                    paymentMethod: PaymentMethod.SAVEDCARD,
-                  });
-                }}
-              />
-              <SizedBox height={20} />
-            </React.Fragment>
-          ))}
-
-        {paymentState.paymentOptions != null &&
-          paymentState.paymentOptions.bank.map((bank) => (
-            <React.Fragment key={bank.bankId}>
-              <BankTile
-                bank={bank}
-                isSelected={
-                  paymentState.paymentMethod === PaymentMethod.SAVEDBANK &&
-                  paymentState.bankId === bank.bankId
-                }
-                paymentMethod={PaymentMethod.SAVEDBANK}
-                onPress={() => {
-                  handleSetPaymentState({
-                    bankId: bank.bankId,
-                    bankOptions: bank,
-                    paymentMethod: PaymentMethod.SAVEDBANK,
-                  });
-                }}
-              />
-              <SizedBox height={20} />
-            </React.Fragment>
-          ))}
-      </>
-    );
-  }, [
-    paymentState.paymentOptions,
-    paymentState.paymentMethod,
-    paymentState.bankId,
-    handleSetPaymentState,
-  ]);
 
   const renderButton = useCallback(() => {
     if (isLoading || piiLoading) {
@@ -380,34 +328,44 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       <Text style={styles.mainTitle}>Payment Methods</Text>
       <SizedBox height={40} />
 
-      {renderSavedPaymentOptions()}
-
-      <PaymentMethodTile
-        title="Pay by Transfer"
-        subTitle="Pay by bank transfer"
-        isSelected={paymentState.paymentMethod === PaymentMethod.TRANSFER}
-        paymentMethod={PaymentMethod.TRANSFER}
-        onPress={() => {
+      <SavedPaymentOptionsList
+        paymentOptions={paymentState.paymentOptions}
+        paymentMethod={paymentState.paymentMethod}
+        bankOptions={paymentState.bankOptions}
+        onSelected={(bankOptions, paymentMethod) => {
           handleSetPaymentState({
-            paymentMethod: PaymentMethod.TRANSFER,
-            bankId: null,
-            bankOptions: null,
+            bankId: bankOptions.bankId,
+            bankOptions,
+            paymentMethod,
           });
         }}
       />
+      <BankOptionsTile
+        title="Pay by Transfer"
+        subtitle="Pay by bank transfer"
+        isSelected={paymentState.paymentMethod === PaymentMethod.TRANSFER}
+        paymentMethod={PaymentMethod.TRANSFER}
+        onPress={(paymentMethod, bankOptions) =>
+          handleSetPaymentState({
+            paymentMethod: paymentMethod,
+            bankId: bankOptions?.bankId,
+            bankOptions: bankOptions,
+          })
+        }
+      />
       <SizedBox height={30} />
-      <PaymentMethodTile
+      <BankOptionsTile
         title="Pay with Card"
-        subTitle="Visa, Verve and Mastercard accepted"
+        subtitle="Visa, Verve and Mastercard accepted"
         isSelected={paymentState.paymentMethod === PaymentMethod.CARD}
         paymentMethod={PaymentMethod.CARD}
-        onPress={() => {
+        onPress={(paymentMethod, bankOptions) =>
           handleSetPaymentState({
-            paymentMethod: PaymentMethod.CARD,
-            bankId: null,
-            bankOptions: null,
-          });
-        }}
+            paymentMethod: paymentMethod,
+            bankId: bankOptions?.bankId,
+            bankOptions: bankOptions,
+          })
+        }
       />
       <SizedBox height={30} />
       {renderButton()}
@@ -513,6 +471,58 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         />
       )}
     </Column>
+  );
+};
+
+const SavedPaymentOptionsList = ({
+  paymentOptions,
+  onSelected,
+  paymentMethod,
+  bankOptions,
+}: {
+  paymentOptions: SavedPaymentOptions | null;
+  paymentMethod: PaymentMethod | null;
+  bankOptions: BankOptions | null;
+  onSelected: (bankOptions: BankOptions, paymentMethod: PaymentMethod) => void;
+}) => {
+  return (
+    <>
+      {paymentOptions != null &&
+        paymentOptions.card?.map((bank) => (
+          <React.Fragment key={bank.bankId}>
+            <BankOptionsTile
+              bank={bank}
+              isSelected={
+                paymentMethod === PaymentMethod.SAVEDCARD &&
+                bankOptions?.bankId === bank.bankId
+              }
+              paymentMethod={PaymentMethod.SAVEDCARD}
+              onPress={(paymentMethod, bankOptions) =>
+                onSelected(bankOptions!, paymentMethod!)
+              }
+            />
+            <SizedBox height={20} />
+          </React.Fragment>
+        ))}
+
+      {paymentOptions != null &&
+        paymentOptions.bank.map((bank) => (
+          <React.Fragment key={bank.bankId}>
+            <BankOptionsTile
+              bank={bank}
+              isSelected={
+                paymentMethod === PaymentMethod.SAVEDBANK &&
+                bankOptions?.bankId === bank.bankId
+              }
+              paymentMethod={PaymentMethod.SAVEDBANK}
+              onPress={(paymentMethod, bankOptions) =>
+                onSelected(bankOptions!, paymentMethod!)
+              }
+            />
+            <SizedBox height={20} />
+          </React.Fragment>
+        ))}
+    </>
   );
 };
 

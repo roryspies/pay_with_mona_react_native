@@ -4,12 +4,14 @@ interface InitializePaymentProps {
   transactionId: string;
   onPaymentUpdate: (event: SSEEvent) => void;
   onTransactionUpdate: (event: SSEEvent) => void;
+  onError?: (error: Error) => void;
 }
 
 export const useInitializePayment = ({
   transactionId,
   onPaymentUpdate,
   onTransactionUpdate,
+  onError,
 }: InitializePaymentProps) => {
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -38,6 +40,7 @@ export const useInitializePayment = ({
       });
     } catch (error) {
       console.log('Unable to listen to event', error);
+      onError?.(error as Error);
     } finally {
       setLoading(false);
     }
