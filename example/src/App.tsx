@@ -1,68 +1,58 @@
-import { Text, View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { PayWithMona } from 'pay-with-mona-react-native';
+import React from 'react';
+import HomeScreen from './features/home/HomeScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import CheckoutScreen from './features/checkout/CheckoutScreen';
+import CollectionScreen from './features/collections/CollectionScreen';
+import {
+  PayWithMonaCollectionsProvider,
+  type SavedPaymentOptions,
+} from 'pay-with-mona-react-native';
+import CollectionScheduledScreen from './features/collections/CollectionScheduledScreen';
 
-export default function App() {
+export type StackParamList = {
+  Home: undefined;
+  Checkout: {
+    amount: string;
+    transactionId: string;
+    savedPaymentOptions: SavedPaymentOptions;
+    onAuthUpdate?: () => void;
+  };
+  Collections: {
+    phoneNumber: string;
+    dob: string;
+    bvn: string;
+  };
+  CollectionScheduled: {
+    phoneNumber: string;
+    dob: string;
+    bvn: string;
+  };
+};
+
+const Stack = createNativeStackNavigator<StackParamList>();
+
+const RootStack = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.nav}>
-        <Text>Back</Text>
-        <Text style={styles.title}>Checkout</Text>
-      </View>
-      <ScrollView>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Payment Summary</Text>
-          <View style={styles.heightSpacer} />
-          <View style={styles.headerBottom}>
-            <Text>Total</Text>
-            <Text>₦1,000</Text>
-          </View>
-        </View>
-        <View style={styles.heightSpacer} />
-        <PayWithMona
-          merchantKey=";"
-          transactionId="1234567890"
-          amount={2000}
-          // onSuccess={() => {}}
-          // onError={() => {}}
-        />
-      </ScrollView>
-    </SafeAreaView>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} />
+      <Stack.Screen name="Collections" component={CollectionScreen} />
+      <Stack.Screen
+        name="CollectionScheduled"
+        component={CollectionScheduledScreen}
+      />
+    </Stack.Navigator>
+  );
+};
+
+function App(): React.JSX.Element {
+  return (
+    <PayWithMonaCollectionsProvider merchantKey={'mona_pub_5361ecf7'}>
+      <NavigationContainer>
+        <RootStack />
+      </NavigationContainer>
+    </PayWithMonaCollectionsProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F2F3',
-  },
-  nav: {
-    flexDirection: 'row',
-    width: '100%',
-    paddingVertical: 30,
-    paddingHorizontal: 20,
-  },
-  header: {
-    alignItems: 'center',
-    width: '100%',
-    paddingVertical: 30,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  headerBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  },
-  heightSpacer: {
-    height: 10,
-  },
-  title: {
-    flex: 1,
-    textAlign: 'center',
-  },
-});
+export default App;

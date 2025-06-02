@@ -91,11 +91,12 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
+    "@react-native-async-storage/async-storage": "*",
     "@react-native-cookies/cookies": "*",
     "react": "*",
     "react-native": "*",
     "react-native-biometrics": "*",
-    "react-native-custom-tabs": "https://github.com/cscoderr/react-native-custom-tabs.git",
+    "react-native-custom-tabs": "*",
     "react-native-mmkv": "*"
   },
   "workspaces": [
@@ -172,7 +173,6 @@
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
-    "dayjs": "^1.11.13",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-sse": "^1.2.1",
     "react-native-uuid": "^2.0.3"
