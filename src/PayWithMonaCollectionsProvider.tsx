@@ -165,6 +165,7 @@ export const PayWithMonaCollectionsProvider = ({
         ref={collectionAccountModalRef}
         loading={loadingState.collectionConsent || validatePIILoading}
         savedPaymentOptions={validationData}
+        accessRequestId={requestId}
         onSubmit={createCollectionConsentRequest}
       />
 
