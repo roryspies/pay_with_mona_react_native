@@ -1,156 +1,180 @@
 import { View, Text, StyleSheet, TextInput, Keyboard } from 'react-native';
 import { MonaColors } from '../utils/config';
-import { useState, useRef, useEffect } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  type ForwardedRef,
+  useImperativeHandle,
+} from 'react';
 import MonaButton from '../components/MonaButton';
-import { TaskType, type PinEntryTask } from '../types';
+import { TaskType, type ModalType, type PinEntryTask } from '../types';
 import MonaModal from './MonaModal';
 
-const EntryTaskModal = ({
-  visible,
-  setVisible,
-  pinEntryTask,
-  onSubmit,
-}: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-  pinEntryTask: PinEntryTask;
-  onSubmit: (pin: string) => void;
-}) => {
-  const PIN_LENGTH = pinEntryTask.fieldLength ?? 4;
-  const [pin, setPin] = useState('');
-  const [focusedIndex, setFocusedIndex] = useState(0);
+const EntryTaskModal = forwardRef(
+  (
+    {
+      pinEntryTask,
+      onSubmit,
+    }: {
+      pinEntryTask: PinEntryTask;
+      onSubmit: (pin: string) => void;
+    },
+    ref: ForwardedRef<ModalType>
+  ) => {
+    const PIN_LENGTH = pinEntryTask.fieldLength ?? 4;
+    const [pin, setPin] = useState('');
+    const [focusedIndex, setFocusedIndex] = useState(0);
+    const [showModal, setShowModal] = useState<boolean>(false);
 
-  // Create refs for each input
-  const inputRefs = useRef<Array<TextInput | null>>([]);
+    const open = () => {
+      setShowModal(true);
+    };
+    const close = () => {
+      setShowModal(false);
+    };
 
-  // Initialize refs array
-  useEffect(() => {
-    inputRefs.current = Array(PIN_LENGTH).fill(null);
-  }, [PIN_LENGTH]);
+    useImperativeHandle(ref, () => ({
+      open,
+      close,
+    }));
 
-  // Auto-advance to next input when typing
-  useEffect(() => {
-    // Focus the appropriate input based on PIN length
-    if (pin.length < PIN_LENGTH) {
-      inputRefs.current[pin.length]?.focus();
-    } else {
-      // When all digits are entered, dismiss keyboard
-      Keyboard.dismiss();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pin]);
+    // Create refs for each input
+    const inputRefs = useRef<Array<TextInput | null>>([]);
 
-  // Handle pin input changes
-  const handlePinChange = (text: string) => {
-    // Only accept numbers and limit to PIN_LENGTH
-    const newPin = text.replace(/[^0-9]/g, '').slice(0, PIN_LENGTH);
-    setPin(newPin);
+    // Initialize refs array
+    useEffect(() => {
+      inputRefs.current = Array(PIN_LENGTH).fill(null);
+    }, [PIN_LENGTH]);
 
-    // Move focus forward if adding digits
-    if (newPin.length < PIN_LENGTH) {
-      setFocusedIndex(newPin.length);
-    }
-  };
+    // Auto-advance to next input when typing
+    useEffect(() => {
+      // Focus the appropriate input based on PIN length
+      if (pin.length < PIN_LENGTH) {
+        inputRefs.current[pin.length]?.focus();
+      } else {
+        // When all digits are entered, dismiss keyboard
+        Keyboard.dismiss();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pin]);
 
-  // Handle backspace for removing digits
-  const handleKeyPress = (e: any, index: number) => {
-    if (
-      e.nativeEvent.key === 'Backspace' &&
-      pin.length > 0 &&
-      index > 0 &&
-      !pin[index]
-    ) {
-      // Remove the last digit
-      const newPin = pin.slice(0, pin.length - 1);
+    // Handle pin input changes
+    const handlePinChange = (text: string) => {
+      // Only accept numbers and limit to PIN_LENGTH
+      const newPin = text.replace(/[^0-9]/g, '').slice(0, PIN_LENGTH);
       setPin(newPin);
 
-      // Move focus backward
-      if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
-        setFocusedIndex(index - 1);
+      // Move focus forward if adding digits
+      if (newPin.length < PIN_LENGTH) {
+        setFocusedIndex(newPin.length);
       }
-    }
-  };
+    };
 
-  // Clear pin
-  const clearPin = () => {
-    setPin('');
-    setFocusedIndex(0);
-    inputRefs.current[0]?.focus();
-  };
+    // Handle backspace for removing digits
+    const handleKeyPress = (e: any, index: number) => {
+      if (
+        e.nativeEvent.key === 'Backspace' &&
+        pin.length > 0 &&
+        index > 0 &&
+        !pin[index]
+      ) {
+        // Remove the last digit
+        const newPin = pin.slice(0, pin.length - 1);
+        setPin(newPin);
 
-  // Focus handling
-  const handleFocus = (index: number) => {
-    setFocusedIndex(index);
+        // Move focus backward
+        if (index > 0) {
+          inputRefs.current[index - 1]?.focus();
+          setFocusedIndex(index - 1);
+        }
+      }
+    };
 
-    if (index > pin.length) {
-      inputRefs.current[pin.length]?.focus();
-    }
-  };
+    // Clear pin
+    const clearPin = () => {
+      setPin('');
+      setFocusedIndex(0);
+      inputRefs.current[0]?.focus();
+    };
 
-  const handleClose = () => {
-    clearPin();
-  };
+    // Focus handling
+    const handleFocus = (index: number) => {
+      setFocusedIndex(index);
 
-  return (
-    <MonaModal visible={visible} setVisible={setVisible} onClose={handleClose}>
-      <Text style={styles.sheetTitle}>
-        {pinEntryTask.taskType === TaskType.PIN
-          ? 'Enter Your Transaction PIN'
-          : 'Please pass the transaction OTP'}
-      </Text>
-      <Text style={styles.sheetContent}>{pinEntryTask.taskDescription}</Text>
+      if (index > pin.length) {
+        inputRefs.current[pin.length]?.focus();
+      }
+    };
 
-      <View style={styles.pinInputContainer}>
-        {Array.from({ length: PIN_LENGTH }).map((_, index) => {
-          const isFocused = focusedIndex === index;
-          const digit = pin[index] || '';
+    const handleClose = () => {
+      clearPin();
+    };
 
-          return (
-            <TextInput
-              key={index}
-              ref={(ref) => {
-                if (ref) {
-                  inputRefs.current[index] = ref;
-                }
-              }}
-              style={[
-                styles.pinInput,
-                isFocused && styles.pinInputFocused,
-                digit ? styles.pinInputFilled : null,
-              ]}
-              secureTextEntry
-              keyboardType="number-pad"
-              maxLength={1}
-              value={digit}
-              onChangeText={(text) => {
-                // Update the pin at this specific position
-                const newPin =
-                  pin.slice(0, index) + text + pin.slice(index + 1);
-                handlePinChange(newPin);
-              }}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              onFocus={() => handleFocus(index)}
-              caretHidden={true}
-            />
-          );
-        })}
-      </View>
+    return (
+      <MonaModal
+        visible={showModal}
+        setVisible={setShowModal}
+        onClose={handleClose}
+      >
+        <Text style={styles.sheetTitle}>
+          {pinEntryTask.taskType === TaskType.PIN
+            ? 'Enter Your Transaction PIN'
+            : 'Please pass the transaction OTP'}
+        </Text>
+        <Text style={styles.sheetContent}>{pinEntryTask.taskDescription}</Text>
 
-      <MonaButton
-        text="Submit"
-        onPress={() => {
-          if (pin.length === PIN_LENGTH) {
-            setVisible(false);
-            onSubmit(pin);
-            setVisible(false);
-          }
-        }}
-        enabled={pin.length === PIN_LENGTH}
-      />
-    </MonaModal>
-  );
-};
+        <View style={styles.pinInputContainer}>
+          {Array.from({ length: PIN_LENGTH }).map((_, index) => {
+            const isFocused = focusedIndex === index;
+            const digit = pin[index] || '';
+
+            return (
+              <TextInput
+                key={index}
+                ref={(ref) => {
+                  if (ref) {
+                    inputRefs.current[index] = ref;
+                  }
+                }}
+                style={[
+                  styles.pinInput,
+                  isFocused && styles.pinInputFocused,
+                  digit ? styles.pinInputFilled : null,
+                ]}
+                secureTextEntry
+                keyboardType="number-pad"
+                maxLength={1}
+                value={digit}
+                onChangeText={(text) => {
+                  // Update the pin at this specific position
+                  const newPin =
+                    pin.slice(0, index) + text + pin.slice(index + 1);
+                  handlePinChange(newPin);
+                }}
+                onKeyPress={(e) => handleKeyPress(e, index)}
+                onFocus={() => handleFocus(index)}
+                caretHidden={true}
+              />
+            );
+          })}
+        </View>
+
+        <MonaButton
+          text="Submit"
+          onPress={() => {
+            if (pin.length === PIN_LENGTH) {
+              setShowModal(false);
+              onSubmit(pin);
+            }
+          }}
+          enabled={pin.length === PIN_LENGTH}
+        />
+      </MonaModal>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   sheetTitle: {

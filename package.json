@@ -91,12 +91,11 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@react-native-async-storage/async-storage": "*",
     "@react-native-cookies/cookies": "*",
     "react": "*",
     "react-native": "*",
     "react-native-biometrics": "*",
-    "react-native-custom-tabs": "*",
+    "react-native-custom-tabs": "https://github.com/cscoderr/react-native-custom-tabs.git",
     "react-native-mmkv": "*"
   },
   "workspaces": [

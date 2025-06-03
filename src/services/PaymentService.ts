@@ -231,7 +231,7 @@ class PaymentService {
     sessionId,
     extraPayload,
     onTaskUpdate,
-  }: PaymentRequestOptions): Promise<any> {
+  }: PaymentRequestOptions): Promise<void> {
     try {
       // Get stored authentication credentials
       const monaCheckoutID = this.storage.getString('monaCheckoutID') ?? '';
@@ -324,7 +324,7 @@ class PaymentService {
     amount,
     sessionId,
     onTaskUpdate,
-  }: SubmitPaymentRequestParams): Promise<any> {
+  }: SubmitPaymentRequestParams): Promise<void> {
     try {
       this.ensureInitialized();
       // Set authentication cookie
@@ -333,6 +333,7 @@ class PaymentService {
         value: monaCheckoutID,
         path: '/',
       });
+      console.log(monaCheckoutID);
 
       const headers: Record<string, string> = {
         'x-client-type': CLIENT_TYPE,
@@ -346,14 +347,12 @@ class PaymentService {
       if (paymentMethod === PaymentMethod.SAVEDCARD)
         headers['x-mona-checkout-type'] = 'card';
 
-      console.log(monaCheckoutID);
-      console.log(headers);
-
       // Submit payment request
       const response = await this.api.post<any>(`/pay`, payload, {
         headers,
         credentials: 'include',
       });
+      console.log(response.status);
 
       // Handle successful response
       if (response.status === 200) {
@@ -374,8 +373,9 @@ class PaymentService {
             sessionId,
           });
         } else if (
-          ['pin', 'entry', 'otp'].includes(response.data.task.taskType) ||
-          ['pin', 'entry', 'otp'].includes(response.data.task.fieldType)
+          ['pin', 'entry', 'otp', 'phone'].includes(
+            response.data.task.fieldType
+          )
         ) {
           onTaskUpdate?.(response.data.task);
         }

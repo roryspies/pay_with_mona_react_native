@@ -34,6 +34,7 @@ const MonaButton = ({
         style,
         enabled && !isLoading ? { opacity: 1 } : { opacity: 0.5 },
       ]}
+      activeOpacity={0.9}
       disabled={!enabled || isLoading}
       onPress={enabled ? onPress : undefined}
     >
