@@ -1,9 +1,12 @@
 const path = require('path');
+const escape = require('escape-string-regexp');
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const { getConfig } = require('react-native-builder-bob/metro-config');
+const exclusionList = require('metro-config/src/defaults/exclusionList');
 const pkg = require('../package.json');
 
 const root = path.resolve(__dirname, '..');
+const modules = Object.keys({ ...pkg.peerDependencies });
 
 // /**
 //  * Metro configuration
@@ -23,17 +26,17 @@ module.exports = mergeConfig(config, {
   root,
   pkg,
   project: __dirname,
-  watchFolders: [
-    path.resolve(__dirname, '..'), // pay-with-mona root folder
-  ],
+  watchFolders: [root],
   resolver: {
-    extraNodeModules: {
-      'react-native': path.resolve(
-        __dirname,
-        '..',
-        'node_modules',
-        'react-native'
-      ),
-    },
+    blockListRE: exclusionList(
+      modules.map(
+        (m) =>
+          new RegExp(`^${escape(path.join(root, 'node_modules', m))}\\/.*$`)
+      )
+    ),
+    extraNodeModules: modules.reduce((acc, name) => {
+      acc[name] = path.join(__dirname, 'node_modules', name);
+      return acc;
+    }, {}),
   },
 });

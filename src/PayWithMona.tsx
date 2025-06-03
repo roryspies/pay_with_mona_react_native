@@ -14,9 +14,11 @@ import BankOptionsTile from './components/BankOptionsTile';
 import { PaymentMethod, TransactionStatus } from './utils/enums';
 import { styles } from './styles';
 import {
+  TaskType,
   type BankOptions,
   type ModalType,
   type PayWithMonaProps,
+  type PinEntryTask,
   type SavedPaymentOptions,
 } from './types';
 import { useInitializePayment } from './hooks/useInitializePayment';
@@ -54,6 +56,7 @@ interface PaymentState {
   deviceAuth: any | null;
   sessionId: string | null;
   transactionStatus: TransactionStatus | null;
+  entryTask: PinEntryTask | null;
 }
 
 const PayWithMona: React.FC<PayWithMonaProps> = ({
@@ -66,6 +69,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   onAuthUpdate,
 }) => {
   const keyExchangeModalRef = useRef<ModalType>(null);
+  const entryTaskModalRef = useRef<ModalType>(null);
   const [modalState, setModalState] = useState({
     showInitiated: false,
     showSuccess: false,
@@ -80,6 +84,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     deviceAuth: null,
     sessionId: null,
     transactionStatus: null,
+    entryTask: null,
   });
   const [loadingState, setLoadingState] = useState<LoadingState>({
     main: false,
@@ -146,7 +151,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     [handleSetModalState, handleSetPaymentState]
   );
 
-  const { initialize: initializePayment } = useInitializePayment({
+  const { initializeEvent } = useInitializePayment({
     transactionId,
     onError: onError,
     onPaymentUpdate: (event) => {
@@ -226,7 +231,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         bankId: null,
         bankOptions: null,
       });
-      await initializePayment();
+      await initializeEvent();
       handleSetModalState({ showFailure: false });
       handleSetLoadingState('retry', false);
     } catch (e) {
@@ -236,22 +241,19 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   }, [
     handleSetLoadingState,
     handleSetPaymentState,
-    initializePayment,
+    initializeEvent,
     handleSetModalState,
   ]);
 
-  const {
-    loading: paymentLoading,
-    handlePayment,
-    pinEntryTask,
-    showEntryTask,
-    setShowEntryTask,
-  } = useMakePayment({
+  const { loading: paymentLoading, handlePayment } = useMakePayment({
     amount,
     bankId: paymentState.bankId,
     transactionId,
     paymentMethod: paymentState.paymentMethod,
     merchantKey,
+    onEntryTaskUpdate: (entryTask: PinEntryTask | null) => {
+      handleSetPaymentState({ entryTask: entryTask });
+    },
     handleAuthEventUpdate: handleAuthEventUpdate,
     handleCloseEventUpdate: () => validatePII(),
   });
@@ -300,19 +302,19 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         enabled={paymentState.paymentMethod != null}
         onPress={async () => {
           if (isSavedOptions && isAuthenticated()) {
-            initializePayment();
+            initializeEvent();
             handleSetModalState({ showConfirmation: true });
           } else {
             await handlePayment({
               isOneTap: isSavedOptions,
-              onTapHandler: () => initializePayment(),
+              onTapHandler: () => initializeEvent(),
             });
           }
         }}
       />
     );
   }, [
-    initializePayment,
+    initializeEvent,
     isLoading,
     piiLoading,
     handlePayment,
@@ -370,20 +372,22 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       <SizedBox height={30} />
       {renderButton()}
 
-      {showEntryTask && pinEntryTask != null && (
+      {paymentState.entryTask != null && (
         <EntryTaskModal
-          visible={showEntryTask}
-          setVisible={setShowEntryTask}
-          pinEntryTask={pinEntryTask}
+          ref={entryTaskModalRef}
+          pinEntryTask={paymentState.entryTask}
           onSubmit={(pin) => {
             console.log('PIN submitted', pin);
             handlePayment({
               isOneTap: true,
-              payload: pinEntryTask.fieldName
-                ? {
-                    [pinEntryTask.fieldName]: pin,
-                  }
-                : undefined,
+              payload:
+                paymentState.entryTask?.fieldName != null &&
+                (paymentState.entryTask?.fieldType == TaskType.OTP ||
+                  paymentState.entryTask?.fieldType == TaskType.PIN)
+                  ? {
+                      [paymentState.entryTask.fieldName]: pin,
+                    }
+                  : undefined,
             });
           }}
         />

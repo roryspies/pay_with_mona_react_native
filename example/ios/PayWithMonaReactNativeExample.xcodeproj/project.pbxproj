@@ -8,30 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		0C80B921A6F3F58F76C31292 /* libPods-PayWithMonaReactNativeExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-PayWithMonaReactNativeExample.a */; };
+		10240537DE5C44918AE04F89 /* NeueMontreal-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8A488B27D59F4D919FA0ACBC /* NeueMontreal-Regular.otf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		25C20AD845034523B2B7A783 /* GeneralSans-Extralight.otf in Resources */ = {isa = PBXBuildFile; fileRef = CEC56E42A0E94DF8A5DA6020 /* GeneralSans-Extralight.otf */; };
+		2C4DC4E66AD646F997520B0A /* GeneralSans-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2E9929350C53432299D5D89E /* GeneralSans-Medium.otf */; };
 		6630780AC10CA48F5B2ADFDC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		6C80460651C64587A0A12BB3 /* NeueMontreal-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8B3F0C54EE074AED825B9497 /* NeueMontreal-LightItalic.otf */; };
+		6CDE14FEA5D4453A8AB018B4 /* NeueMontreal-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = CBDBBB4D221C47B5AF0A7EB8 /* NeueMontreal-Light.otf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		BDEE9A875C4341E3BB0BBDA4 /* GeneralSans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5FEB0AB343F542F4B8E0766D /* GeneralSans-Bold.otf */; };
-		ED3F003F97924835A61CFA5F /* GeneralSans-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 259B5CA7F6EB4F3CBD61D7F7 /* GeneralSans-BoldItalic.otf */; };
-		25C20AD845034523B2B7A783 /* GeneralSans-Extralight.otf in Resources */ = {isa = PBXBuildFile; fileRef = CEC56E42A0E94DF8A5DA6020 /* GeneralSans-Extralight.otf */; };
-		CE48474C3D8C4CD3AA62D447 /* GeneralSans-ExtralightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = D21EF2B787294BB4A015003C /* GeneralSans-ExtralightItalic.otf */; };
-		C6C41877176C40F18E8F83FB /* GeneralSans-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = D4AE23BFCBCC4D3EABE704C9 /* GeneralSans-Italic.otf */; };
-		FD4D2A6ABED14888B03C48A5 /* GeneralSans-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = A2E1BF2EE6B54896822773FE /* GeneralSans-Light.otf */; };
-		FA3F819F2A73422C8C1EC5ED /* GeneralSans-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = C4F8295C53B34D65A5954DB3 /* GeneralSans-LightItalic.otf */; };
-		2C4DC4E66AD646F997520B0A /* GeneralSans-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2E9929350C53432299D5D89E /* GeneralSans-Medium.otf */; };
-		E1FAF2027315447DBC10161C /* GeneralSans-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4CBB57C7FE23409B9A3C13AF /* GeneralSans-MediumItalic.otf */; };
-		CAD828E75D154BCF99B6FD3D /* GeneralSans-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3CC880BAE58B4FA39D4C0A3D /* GeneralSans-Regular.otf */; };
-		F9724DE8F87F4028B263D3F2 /* GeneralSans-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = AC4B189DDFC74D7F91E18E9D /* GeneralSans-Semibold.otf */; };
-		E97A5910275D4B769CEC1CA2 /* GeneralSans-SemiboldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = ACDBD4FA123A48E7BBC35E50 /* GeneralSans-SemiboldItalic.otf */; };
 		840D026D715143BD9BEF73AF /* NeueMontreal-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 6818AF15001A48C282B370F8 /* NeueMontreal-Bold.otf */; };
-		93DBAEB9D98E4BEB9B4343C0 /* NeueMontreal-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = E77C4DFAF2FC4EE786A0CABB /* NeueMontreal-BoldItalic.otf */; };
-		CDE8EA6386B04B34976AF0F2 /* NeueMontreal-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7BCECB208964402CAB05C526 /* NeueMontreal-Italic.otf */; };
-		6CDE14FEA5D4453A8AB018B4 /* NeueMontreal-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = CBDBBB4D221C47B5AF0A7EB8 /* NeueMontreal-Light.otf */; };
-		6C80460651C64587A0A12BB3 /* NeueMontreal-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8B3F0C54EE074AED825B9497 /* NeueMontreal-LightItalic.otf */; };
-		E0BB4E4DE2A24D9DB717C687 /* NeueMontreal-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = D2BC1B1728A54F2793E1CD4A /* NeueMontreal-Medium.otf */; };
 		87477C93A7B94952BB64B855 /* NeueMontreal-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 538FEA184FB44FDDA4B98E19 /* NeueMontreal-MediumItalic.otf */; };
-		10240537DE5C44918AE04F89 /* NeueMontreal-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8A488B27D59F4D919FA0ACBC /* NeueMontreal-Regular.otf */; };
+		93DBAEB9D98E4BEB9B4343C0 /* NeueMontreal-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = E77C4DFAF2FC4EE786A0CABB /* NeueMontreal-BoldItalic.otf */; };
+		BDEE9A875C4341E3BB0BBDA4 /* GeneralSans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5FEB0AB343F542F4B8E0766D /* GeneralSans-Bold.otf */; };
+		C6C41877176C40F18E8F83FB /* GeneralSans-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = D4AE23BFCBCC4D3EABE704C9 /* GeneralSans-Italic.otf */; };
+		CAD828E75D154BCF99B6FD3D /* GeneralSans-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3CC880BAE58B4FA39D4C0A3D /* GeneralSans-Regular.otf */; };
+		CDE8EA6386B04B34976AF0F2 /* NeueMontreal-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7BCECB208964402CAB05C526 /* NeueMontreal-Italic.otf */; };
+		CE48474C3D8C4CD3AA62D447 /* GeneralSans-ExtralightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = D21EF2B787294BB4A015003C /* GeneralSans-ExtralightItalic.otf */; };
+		E0BB4E4DE2A24D9DB717C687 /* NeueMontreal-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = D2BC1B1728A54F2793E1CD4A /* NeueMontreal-Medium.otf */; };
+		E1FAF2027315447DBC10161C /* GeneralSans-MediumItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4CBB57C7FE23409B9A3C13AF /* GeneralSans-MediumItalic.otf */; };
+		E97A5910275D4B769CEC1CA2 /* GeneralSans-SemiboldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = ACDBD4FA123A48E7BBC35E50 /* GeneralSans-SemiboldItalic.otf */; };
+		ED3F003F97924835A61CFA5F /* GeneralSans-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 259B5CA7F6EB4F3CBD61D7F7 /* GeneralSans-BoldItalic.otf */; };
+		F9724DE8F87F4028B263D3F2 /* GeneralSans-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = AC4B189DDFC74D7F91E18E9D /* GeneralSans-Semibold.otf */; };
+		FA3F819F2A73422C8C1EC5ED /* GeneralSans-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = C4F8295C53B34D65A5954DB3 /* GeneralSans-LightItalic.otf */; };
+		FD4D2A6ABED14888B03C48A5 /* GeneralSans-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = A2E1BF2EE6B54896822773FE /* GeneralSans-Light.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,32 +39,32 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = PayWithMonaReactNativeExample/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PayWithMonaReactNativeExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = PayWithMonaReactNativeExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		259B5CA7F6EB4F3CBD61D7F7 /* GeneralSans-BoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-BoldItalic.otf"; path = "../src/assets/fonts/GeneralSans-BoldItalic.otf"; sourceTree = "<group>"; };
+		2E9929350C53432299D5D89E /* GeneralSans-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Medium.otf"; path = "../src/assets/fonts/GeneralSans-Medium.otf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-PayWithMonaReactNativeExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PayWithMonaReactNativeExample.debug.xcconfig"; path = "Target Support Files/Pods-PayWithMonaReactNativeExample/Pods-PayWithMonaReactNativeExample.debug.xcconfig"; sourceTree = "<group>"; };
+		3CC880BAE58B4FA39D4C0A3D /* GeneralSans-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Regular.otf"; path = "../src/assets/fonts/GeneralSans-Regular.otf"; sourceTree = "<group>"; };
+		4CBB57C7FE23409B9A3C13AF /* GeneralSans-MediumItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-MediumItalic.otf"; path = "../src/assets/fonts/GeneralSans-MediumItalic.otf"; sourceTree = "<group>"; };
+		538FEA184FB44FDDA4B98E19 /* NeueMontreal-MediumItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-MediumItalic.otf"; path = "../src/assets/fonts/NeueMontreal-MediumItalic.otf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-PayWithMonaReactNativeExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PayWithMonaReactNativeExample.release.xcconfig"; path = "Target Support Files/Pods-PayWithMonaReactNativeExample/Pods-PayWithMonaReactNativeExample.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-PayWithMonaReactNativeExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PayWithMonaReactNativeExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5FEB0AB343F542F4B8E0766D /* GeneralSans-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Bold.otf"; path = "../src/assets/fonts/GeneralSans-Bold.otf"; sourceTree = "<group>"; };
+		6818AF15001A48C282B370F8 /* NeueMontreal-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-Bold.otf"; path = "../src/assets/fonts/NeueMontreal-Bold.otf"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = PayWithMonaReactNativeExample/AppDelegate.swift; sourceTree = "<group>"; };
+		7BCECB208964402CAB05C526 /* NeueMontreal-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-Italic.otf"; path = "../src/assets/fonts/NeueMontreal-Italic.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = PayWithMonaReactNativeExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8A488B27D59F4D919FA0ACBC /* NeueMontreal-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-Regular.otf"; path = "../src/assets/fonts/NeueMontreal-Regular.otf"; sourceTree = "<group>"; };
+		8B3F0C54EE074AED825B9497 /* NeueMontreal-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-LightItalic.otf"; path = "../src/assets/fonts/NeueMontreal-LightItalic.otf"; sourceTree = "<group>"; };
+		A2E1BF2EE6B54896822773FE /* GeneralSans-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Light.otf"; path = "../src/assets/fonts/GeneralSans-Light.otf"; sourceTree = "<group>"; };
+		AC4B189DDFC74D7F91E18E9D /* GeneralSans-Semibold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Semibold.otf"; path = "../src/assets/fonts/GeneralSans-Semibold.otf"; sourceTree = "<group>"; };
+		ACDBD4FA123A48E7BBC35E50 /* GeneralSans-SemiboldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-SemiboldItalic.otf"; path = "../src/assets/fonts/GeneralSans-SemiboldItalic.otf"; sourceTree = "<group>"; };
+		C4F8295C53B34D65A5954DB3 /* GeneralSans-LightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-LightItalic.otf"; path = "../src/assets/fonts/GeneralSans-LightItalic.otf"; sourceTree = "<group>"; };
+		CBDBBB4D221C47B5AF0A7EB8 /* NeueMontreal-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-Light.otf"; path = "../src/assets/fonts/NeueMontreal-Light.otf"; sourceTree = "<group>"; };
+		CEC56E42A0E94DF8A5DA6020 /* GeneralSans-Extralight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Extralight.otf"; path = "../src/assets/fonts/GeneralSans-Extralight.otf"; sourceTree = "<group>"; };
+		D21EF2B787294BB4A015003C /* GeneralSans-ExtralightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-ExtralightItalic.otf"; path = "../src/assets/fonts/GeneralSans-ExtralightItalic.otf"; sourceTree = "<group>"; };
+		D2BC1B1728A54F2793E1CD4A /* NeueMontreal-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-Medium.otf"; path = "../src/assets/fonts/NeueMontreal-Medium.otf"; sourceTree = "<group>"; };
+		D4AE23BFCBCC4D3EABE704C9 /* GeneralSans-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "GeneralSans-Italic.otf"; path = "../src/assets/fonts/GeneralSans-Italic.otf"; sourceTree = "<group>"; };
+		E77C4DFAF2FC4EE786A0CABB /* NeueMontreal-BoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "NeueMontreal-BoldItalic.otf"; path = "../src/assets/fonts/NeueMontreal-BoldItalic.otf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		5FEB0AB343F542F4B8E0766D /* GeneralSans-Bold.otf */ = {isa = PBXFileReference; name = "GeneralSans-Bold.otf"; path = "../src/assets/fonts/GeneralSans-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		259B5CA7F6EB4F3CBD61D7F7 /* GeneralSans-BoldItalic.otf */ = {isa = PBXFileReference; name = "GeneralSans-BoldItalic.otf"; path = "../src/assets/fonts/GeneralSans-BoldItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		CEC56E42A0E94DF8A5DA6020 /* GeneralSans-Extralight.otf */ = {isa = PBXFileReference; name = "GeneralSans-Extralight.otf"; path = "../src/assets/fonts/GeneralSans-Extralight.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		D21EF2B787294BB4A015003C /* GeneralSans-ExtralightItalic.otf */ = {isa = PBXFileReference; name = "GeneralSans-ExtralightItalic.otf"; path = "../src/assets/fonts/GeneralSans-ExtralightItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		D4AE23BFCBCC4D3EABE704C9 /* GeneralSans-Italic.otf */ = {isa = PBXFileReference; name = "GeneralSans-Italic.otf"; path = "../src/assets/fonts/GeneralSans-Italic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		A2E1BF2EE6B54896822773FE /* GeneralSans-Light.otf */ = {isa = PBXFileReference; name = "GeneralSans-Light.otf"; path = "../src/assets/fonts/GeneralSans-Light.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		C4F8295C53B34D65A5954DB3 /* GeneralSans-LightItalic.otf */ = {isa = PBXFileReference; name = "GeneralSans-LightItalic.otf"; path = "../src/assets/fonts/GeneralSans-LightItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		2E9929350C53432299D5D89E /* GeneralSans-Medium.otf */ = {isa = PBXFileReference; name = "GeneralSans-Medium.otf"; path = "../src/assets/fonts/GeneralSans-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		4CBB57C7FE23409B9A3C13AF /* GeneralSans-MediumItalic.otf */ = {isa = PBXFileReference; name = "GeneralSans-MediumItalic.otf"; path = "../src/assets/fonts/GeneralSans-MediumItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		3CC880BAE58B4FA39D4C0A3D /* GeneralSans-Regular.otf */ = {isa = PBXFileReference; name = "GeneralSans-Regular.otf"; path = "../src/assets/fonts/GeneralSans-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		AC4B189DDFC74D7F91E18E9D /* GeneralSans-Semibold.otf */ = {isa = PBXFileReference; name = "GeneralSans-Semibold.otf"; path = "../src/assets/fonts/GeneralSans-Semibold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		ACDBD4FA123A48E7BBC35E50 /* GeneralSans-SemiboldItalic.otf */ = {isa = PBXFileReference; name = "GeneralSans-SemiboldItalic.otf"; path = "../src/assets/fonts/GeneralSans-SemiboldItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		6818AF15001A48C282B370F8 /* NeueMontreal-Bold.otf */ = {isa = PBXFileReference; name = "NeueMontreal-Bold.otf"; path = "../src/assets/fonts/NeueMontreal-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		E77C4DFAF2FC4EE786A0CABB /* NeueMontreal-BoldItalic.otf */ = {isa = PBXFileReference; name = "NeueMontreal-BoldItalic.otf"; path = "../src/assets/fonts/NeueMontreal-BoldItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		7BCECB208964402CAB05C526 /* NeueMontreal-Italic.otf */ = {isa = PBXFileReference; name = "NeueMontreal-Italic.otf"; path = "../src/assets/fonts/NeueMontreal-Italic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		CBDBBB4D221C47B5AF0A7EB8 /* NeueMontreal-Light.otf */ = {isa = PBXFileReference; name = "NeueMontreal-Light.otf"; path = "../src/assets/fonts/NeueMontreal-Light.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		8B3F0C54EE074AED825B9497 /* NeueMontreal-LightItalic.otf */ = {isa = PBXFileReference; name = "NeueMontreal-LightItalic.otf"; path = "../src/assets/fonts/NeueMontreal-LightItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		D2BC1B1728A54F2793E1CD4A /* NeueMontreal-Medium.otf */ = {isa = PBXFileReference; name = "NeueMontreal-Medium.otf"; path = "../src/assets/fonts/NeueMontreal-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		538FEA184FB44FDDA4B98E19 /* NeueMontreal-MediumItalic.otf */ = {isa = PBXFileReference; name = "NeueMontreal-MediumItalic.otf"; path = "../src/assets/fonts/NeueMontreal-MediumItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		8A488B27D59F4D919FA0ACBC /* NeueMontreal-Regular.otf */ = {isa = PBXFileReference; name = "NeueMontreal-Regular.otf"; path = "../src/assets/fonts/NeueMontreal-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,17 +130,8 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				3B4392A12AC88292D35C810B /* Pods-PayWithMonaReactNativeExample.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-PayWithMonaReactNativeExample.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		8D50C2F22C604D17964C4E41 /* Resources */ = {
-			isa = "PBXGroup";
+			isa = PBXGroup;
 			children = (
 				5FEB0AB343F542F4B8E0766D /* GeneralSans-Bold.otf */,
 				259B5CA7F6EB4F3CBD61D7F7 /* GeneralSans-BoldItalic.otf */,
@@ -164,8 +155,17 @@
 				8A488B27D59F4D919FA0ACBC /* NeueMontreal-Regular.otf */,
 			);
 			name = Resources;
-			sourceTree = "<group>";
 			path = "";
+			sourceTree = "<group>";
+		};
+		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3B4392A12AC88292D35C810B /* Pods-PayWithMonaReactNativeExample.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-PayWithMonaReactNativeExample.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 

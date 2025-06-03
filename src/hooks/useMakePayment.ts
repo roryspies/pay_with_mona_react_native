@@ -14,6 +14,7 @@ const useMakePayment = ({
   paymentMethod,
   handleAuthEventUpdate,
   handleCloseEventUpdate,
+  onEntryTaskUpdate,
   merchantKey,
 }: {
   amount: number;
@@ -21,12 +22,11 @@ const useMakePayment = ({
   transactionId: string;
   paymentMethod?: PaymentMethod | null;
   merchantKey: string;
+  onEntryTaskUpdate?: (entryTask: PinEntryTask | null) => void;
   handleCloseEventUpdate?: () => void;
   handleAuthEventUpdate?: (strongAuthToken: string, sessionId: string) => void;
 }) => {
   const [loading, setLoading] = useState(false);
-  const [pinEntryTask, setPinEntryTask] = useState<PinEntryTask | null>(null);
-  const [showEntryTask, setShowEntryTask] = useState(false);
   const handlePayment = useCallback(
     async ({
       isOneTap,
@@ -73,9 +73,10 @@ const useMakePayment = ({
         } catch (e) {
           console.log('Unable to listen to authn event');
         }
+        onTapHandler?.();
 
         if (isOneTap) {
-          onTapHandler?.();
+          //Instead of handler method, depend on the async/await response
           await paymentServices.makePaymentRequest({
             amount: amount,
             bankId: bankId ?? '',
@@ -89,16 +90,14 @@ const useMakePayment = ({
             onTaskUpdate: (task) => {
               console.log('🔑 Task:', task);
               if (
-                (task.taskType &&
-                  [TaskType.ENTRY, TaskType.PIN, TaskType.OTP].includes(
-                    task.taskType
-                  )) ||
-                [TaskType.ENTRY, TaskType.PIN, TaskType.OTP].includes(
-                  task.fieldType
-                )
+                [
+                  TaskType.ENTRY,
+                  TaskType.PIN,
+                  TaskType.OTP,
+                  TaskType.PHONE,
+                ].includes(task.fieldType)
               ) {
-                setPinEntryTask(task);
-                setShowEntryTask(true);
+                onEntryTaskUpdate?.(task);
               }
             },
           });
@@ -130,9 +129,6 @@ const useMakePayment = ({
   return {
     loading,
     handlePayment,
-    pinEntryTask,
-    showEntryTask,
-    setShowEntryTask,
   };
 };
 

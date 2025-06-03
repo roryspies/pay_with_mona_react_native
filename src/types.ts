@@ -126,6 +126,7 @@ export enum TaskType {
   PIN = 'pin',
   SIGN = 'sign',
   OTP = 'otp',
+  PHONE = 'phone',
 }
 
 export interface CollectionResponse {

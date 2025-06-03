@@ -16,16 +16,18 @@ export const useInitializePayment = ({
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const initialize = useCallback(async () => {
+  const initializeEvent = useCallback(async () => {
     if (!transactionId) return;
     setLoading(true);
     try {
+      //
       await FirebaseSSE.listenToPaymentEvents(transactionId, {
         onData: (event) => {
           onPaymentUpdate(event);
         },
         onError: (error) => {
           console.error('🔥 SSE Error:', error);
+          onError?.(error as Error);
           setValidationError('An error occur, Try again');
         },
       });
@@ -35,6 +37,7 @@ export const useInitializePayment = ({
         },
         onError: (error) => {
           console.error('🔥 SSE Error:', error);
+          onError?.(error as Error);
           setValidationError('An error occur, Try again');
         },
       });
@@ -48,7 +51,7 @@ export const useInitializePayment = ({
   }, [transactionId]);
 
   return {
-    initialize,
+    initializeEvent,
     loading,
     validationError,
   };
