@@ -6,6 +6,7 @@ import uuid from 'react-native-uuid';
 import CryptoJS from 'crypto-js';
 import type { SignPayloadParams } from '../types';
 import { buildSdkUrl, launchSdkUrl } from '../utils/helpers';
+const Buffer = require('buffer').Buffer;
 
 class CollectionService {
   private readonly baseUrl: string;
