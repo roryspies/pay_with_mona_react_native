@@ -85,7 +85,7 @@ const CollectionAccountSelectionDialog = forwardRef(
                 value.bankName!.toLowerCase().includes('kuda') ||
                 value.bankName!.toLowerCase().includes('monie')
               ) {
-                return <View />;
+                return <View key={value.bankId} />;
               }
               return (
                 <View key={value.bankId}>
