@@ -30,11 +30,11 @@ const useMakePayment = ({
   const handlePayment = useCallback(
     async ({
       isOneTap,
-      onTapHandler,
+      onInitialize,
       payload,
     }: {
       isOneTap?: boolean;
-      onTapHandler?: () => void;
+      onInitialize?: () => void;
       payload?: Record<string, string>;
     }) => {
       try {
@@ -42,6 +42,7 @@ const useMakePayment = ({
           throw new Error('Transaction amount cannot be less than ₦20');
         }
         setLoading(true);
+        onInitialize?.();
         const sessionId = generateSessionId();
 
         try {
@@ -73,7 +74,6 @@ const useMakePayment = ({
         } catch (e) {
           console.log('Unable to listen to authn event');
         }
-        onTapHandler?.();
 
         if (isOneTap) {
           //Instead of handler method, depend on the async/await response

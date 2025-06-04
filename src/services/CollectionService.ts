@@ -47,68 +47,12 @@ class CollectionService {
         isCollection: true,
         merchantKey: this.merchantKey!,
       });
+
       await launchSdkUrl(url);
       return false;
     }
     return true;
   }
-  // async validateCollections({
-  //   maximumAmount,
-  //   expiryDate,
-  //   startDate,
-  //   monthlyLimit,
-  //   reference,
-  //   type,
-  //   frequency,
-  //   amount,
-  //   debitType,
-  //   scheduleEntries,
-  // }: {
-  //   maximumAmount: string;
-  //   expiryDate: string;
-  //   startDate: string;
-  //   monthlyLimit: string;
-  //   reference: string;
-  //   type: string;
-  //   frequency: string;
-  //   amount?: string;
-  //   debitType: string;
-  //   scheduleEntries: Record<string, any>[];
-  // }): Promise<ValidateCollectionResponse> {
-  //   console.log(monthlyLimit);
-
-  //   try {
-  //     const payload = {
-  //       maximumAmount: (Number(maximumAmount) * 100).toString(),
-  //       expiryDate,
-  //       startDate,
-  //       reference,
-  //       debitType,
-  //       schedule: {
-  //         type,
-  //         frequency,
-  //         ...(amount && { amount: (Number(amount) * 100).toString() }),
-  //         entries: type === CollectionType.SCHEDULED ? scheduleEntries : [],
-  //       },
-  //     };
-
-  //     const response = await this.api.post<ValidateCollectionResponse>(
-  //       '/collections',
-  //       payload,
-  //       {
-  //         headers: {
-  //           'x-api-key': this.secretKey,
-  //         },
-  //       }
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     if (error instanceof ApiError) {
-  //       throw error;
-  //     }
-  //     throw new Error('Unable to validate collecitons');
-  //   }
-  // }
 
   async createCollections({
     payload,

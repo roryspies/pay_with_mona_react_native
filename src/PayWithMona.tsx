@@ -60,14 +60,17 @@ interface PaymentState {
 }
 
 const PayWithMona: React.FC<PayWithMonaProps> = ({
-  amount,
-  merchantKey,
-  transactionId,
+  config,
   onTransactionUpdate,
-  savedPaymentOptions,
   onError,
   onAuthUpdate,
 }) => {
+  const {
+    amountInKobo: amount,
+    merchantKey,
+    transactionId,
+    savedPaymentOptions,
+  } = config;
   const keyExchangeModalRef = useRef<ModalType>(null);
   const entryTaskModalRef = useRef<ModalType>(null);
   const [modalState, setModalState] = useState({
@@ -301,13 +304,12 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         subText={paymentState.bankOptions?.accountNumber}
         enabled={paymentState.paymentMethod != null}
         onPress={async () => {
+          initializeEvent();
           if (isSavedOptions && isAuthenticated()) {
-            initializeEvent();
             handleSetModalState({ showConfirmation: true });
           } else {
             await handlePayment({
               isOneTap: isSavedOptions,
-              onTapHandler: () => initializeEvent(),
             });
           }
         }}
@@ -377,7 +379,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
           ref={entryTaskModalRef}
           pinEntryTask={paymentState.entryTask}
           onSubmit={(pin) => {
-            console.log('PIN submitted', pin);
             handlePayment({
               isOneTap: true,
               payload:

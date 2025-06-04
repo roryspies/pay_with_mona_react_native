@@ -12,7 +12,7 @@ import { Colors } from '../../../constants/Color';
 import Row from '../../../components/Row';
 import Column from '../../../components/Column';
 import AppTextInput from '../../../components/AppTextInput';
-import { isAuthenticated, signOut } from 'pay-with-mona-react-native';
+import { PayWithMonaSDK } from 'pay-with-mona-react-native';
 import AnimatedIcon from '../../../components/AnimatedIcon';
 
 const formatDob = (text: string) => {
@@ -120,8 +120,8 @@ const Header = ({
         <TouchableOpacity
           onPress={() => {
             if (data.authenticated) {
-              signOut();
-              onChange('authenticated', isAuthenticated());
+              PayWithMonaSDK.signOut();
+              onChange('authenticated', PayWithMonaSDK.isAuthenticated());
             } else {
               onClear();
             }

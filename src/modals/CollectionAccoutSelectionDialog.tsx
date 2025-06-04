@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import MonaModal from './MonaModal';
 import MonaButton from '../components/MonaButton';
 import CircularAvatar from '../components/CircularAvatar';
-import { MonaColors } from '../utils/config';
+import { MonaColors, PAYMENT_BASE_URL } from '../utils/config';
 import SizedBox from '../components/SizedBox';
 import type { BankOptions, ModalType, SavedPaymentOptions } from '../types';
 import BankOptionsTile from '../components/BankOptionsTile';
@@ -104,7 +104,7 @@ const CollectionAccountSelectionDialog = forwardRef(
           <SizedBox height={10} />
           <Pressable
             onPress={async () => {
-              const url = `https://pay.development.mona.ng/collections/enrollment?collectionId=${accessRequestId}`;
+              const url = `${PAYMENT_BASE_URL}/collections/enrollment?collectionId=${accessRequestId}`;
               await launchSdkUrl(url);
             }}
           >

@@ -90,11 +90,15 @@ export type CheckoutResponse = {
   savedPaymentOptions: SavedPaymentOptions;
 };
 
-export interface PayWithMonaProps {
-  amount: number;
+export interface PayWithMonaConfig {
+  amountInKobo: number;
   merchantKey: string;
   transactionId: string;
   savedPaymentOptions?: SavedPaymentOptions;
+}
+
+export interface PayWithMonaProps {
+  config: PayWithMonaConfig;
   onTransactionUpdate?: (status: TransactionStatus) => void;
   onError?: (error: Error) => void;
   onAuthUpdate?: () => void;
@@ -251,3 +255,4 @@ export interface ModalType {
   open: () => void;
   close: () => void;
 }
+//TODO! Remove unused types
