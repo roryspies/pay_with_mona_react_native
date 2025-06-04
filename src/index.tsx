@@ -9,12 +9,12 @@ import BankOptionsTile from './components/BankOptionsTile';
 export const PayWithMonaSDK = {
   initialize,
   validatePII,
+  isAuthenticated,
+  signOut,
 };
 
 export {
   PayWithMona,
-  isAuthenticated,
-  signOut,
   PayWithMonaCollectionsProvider,
   useCollections,
   MonaModal,

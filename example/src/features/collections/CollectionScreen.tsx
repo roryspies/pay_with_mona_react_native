@@ -356,8 +356,9 @@ const CollectionScreen = () => {
               if (!accessRequestId) {
                 return;
               }
-
               await initiateCollection({ accessRequestId: accessRequestId! });
+              //TODO!: Not hiding the dialog before showing custom tab freezes the app on ios
+              //TODO!: The error sepcific the react-native-modal, find the root/replace the package with react native built in modal
               setShowCollectionSummary(false);
             }}
           />

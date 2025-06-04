@@ -19,7 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { type StackParamList } from '../../App';
 import SizedBox from '../../components/SizedBox';
-import { isAuthenticated, PayWithMonaSDK } from 'pay-with-mona-react-native';
+import { PayWithMonaSDK } from 'pay-with-mona-react-native';
 import AppDropdown from '../../components/AppDropdown';
 import AnimatedIcon from '../../components/AnimatedIcon';
 import { ArrowUp2, Edit } from 'iconsax-react-native';
@@ -93,7 +93,7 @@ function HomeScreen() {
   const publicKey = 'mona_pub_5361ecf7';
 
   const authEventUpdate = useCallback(() => {
-    const authenticated = isAuthenticated();
+    const authenticated = PayWithMonaSDK.isAuthenticated();
     handleFormDataChange('authenticated', authenticated);
   }, []);
 
@@ -139,7 +139,6 @@ function HomeScreen() {
               onPress={
                 Number(amount) >= 20
                   ? async () => {
-
                       if (!apiKey || apiKey === '') {
                         Alert.alert('Error', 'Api Key is missing');
                         return;
@@ -200,7 +199,6 @@ function HomeScreen() {
           <AppButton
             text="Collections"
             onPress={() => {
-
               if (!apiKey || apiKey === '') {
                 Alert.alert('Error', 'Merchant Secret Key is missing');
                 return;

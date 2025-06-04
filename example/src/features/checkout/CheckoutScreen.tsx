@@ -2,8 +2,12 @@ import { type StackParamList } from '../../App';
 import Column from '../../components/Column';
 import { Colors } from '../../constants/Color';
 import { type RouteProp, useRoute } from '@react-navigation/native';
-import React from 'react';
-import { PayWithMona, TransactionStatus } from 'pay-with-mona-react-native';
+import React, { useMemo } from 'react';
+import {
+  PayWithMona,
+  TransactionStatus,
+  type PayWithMonaConfig,
+} from 'pay-with-mona-react-native';
 import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import TransactionSummary from './components/TransactionSummary';
 import AppBar from '../../components/AppBar';
@@ -17,6 +21,15 @@ const CheckoutScreen = () => {
   const [transactionStatus, setTransactionStatus] =
     React.useState<TransactionStatus | null>(null);
   const publicKey = 'mona_pub_5361ecf7';
+
+  const payWithMonaConfig: PayWithMonaConfig = useMemo(() => {
+    return {
+      merchantKey: publicKey,
+      amountInKobo: Number(amount) * 100,
+      transactionId,
+      savedPaymentOptions,
+    };
+  }, [publicKey, amount, transactionId, savedPaymentOptions]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -36,10 +49,7 @@ const CheckoutScreen = () => {
           )}
           {transactionStatus == null && (
             <PayWithMona
-              merchantKey={publicKey}
-              amount={Number(amount) * 100}
-              transactionId={transactionId}
-              savedPaymentOptions={savedPaymentOptions}
+              config={payWithMonaConfig}
               onTransactionUpdate={(status: TransactionStatus) =>
                 setTransactionStatus(status)
               }

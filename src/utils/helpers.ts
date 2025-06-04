@@ -69,9 +69,6 @@ export const buildSdkUrl = ({
     return `${PAYMENT_BASE_URL}/collections?loginScope=${merchantKey}&sessionId=${sessionId}`;
   }
 
-  // const url =
-  //   'https://pay.development.mona.ng/collections/enrollment?collectionId=$collectionId';
-
   if (
     isAuthenticated ||
     paymentMethod === PaymentMethod.TRANSFER ||
