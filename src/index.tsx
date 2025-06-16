@@ -1,4 +1,4 @@
-import { PayWithMonaCollectionsProvider } from './PayWithMonaCollectionsProvider';
+import { PayWithMonaCollectionsProvider } from './provider/PayWithMonaCollectionsContext';
 import useCollections from './hooks/useCollections';
 import PayWithMona from './PayWithMona';
 import { initialize, validatePII } from './functions';

@@ -4,7 +4,11 @@ import { ApiError, ApiService } from './ApiService';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import uuid from 'react-native-uuid';
 import CryptoJS from 'crypto-js';
-import type { SignPayloadParams } from '../types';
+import type {
+  CollectionRequestResponse,
+  CollectionResponse,
+  SignPayloadParams,
+} from '../types';
 import { buildSdkUrl, launchSdkUrl } from '../utils/helpers';
 const Buffer = require('buffer').Buffer;
 
@@ -52,6 +56,32 @@ class CollectionService {
       return false;
     }
     return true;
+  }
+
+  async fetchColletionWithId(
+    accessRequestId: string
+  ): Promise<CollectionResponse> {
+    try {
+      this.ensureInitialized();
+      const response = await this.api.get<CollectionRequestResponse>(
+        `/collections/${accessRequestId}`,
+        {
+          headers: {
+            'x-public-key': this.merchantKey!,
+          },
+        }
+      );
+      console.log(response);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+
+      const message =
+        error instanceof ApiError || error instanceof Error
+          ? error.message
+          : 'Unable to get Collections';
+      throw new Error(message);
+    }
   }
 
   async createCollections({

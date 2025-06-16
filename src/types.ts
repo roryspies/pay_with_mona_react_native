@@ -8,14 +8,16 @@ import type {
 
 export type BankOptions = {
   bankName: string;
+  activeIn?: number;
   bankId: string;
   logo: string;
   accountNumber: string;
   webLinkAndroid?: string;
-  institutionCod: string;
+  institutionCode: string;
   isPrimary?: boolean;
   manualPaymentRequired?: boolean;
   hasInstantPay?: boolean;
+  isNibssAlt?: boolean;
   primaryInstruments?: string[];
 };
 
@@ -104,17 +106,20 @@ export interface PayWithMonaProps {
   onAuthUpdate?: () => void;
 }
 
-export interface MerchantColor {
-  primaryColor: string;
+export interface MerchantColors {
+  primaryColour: string;
   primaryText: string;
 }
 export interface MerchantSettings {
-  colors: MerchantColor;
-  image: string;
-  name: string;
-  tradingName: string;
+  colors?: MerchantColors;
+  image?: string;
+  name?: string;
+  tradingName?: string;
 }
-
+export interface MerchantSettingsResponse {
+  data: MerchantSettings;
+  success: boolean;
+}
 export interface PIIData {
   exists: boolean;
   savedPaymentOptions: SavedPaymentOptions;
@@ -133,6 +138,12 @@ export enum TaskType {
   PHONE = 'phone',
 }
 
+export interface CollectionSchedule {
+  type: CollectionType;
+  frequency?: string;
+  entries?: CollectionEntry[];
+  amount?: string;
+}
 export interface CollectionResponse {
   maxAmount: string;
   expiryDate: string | Date;
@@ -140,18 +151,16 @@ export interface CollectionResponse {
   monthlyLimit: string;
   schedule: CollectionSchedule;
   reference: string;
-  status: string;
+  status?: string;
   lastCollectedAt?: string;
   nextCollectionAt?: string;
-  frequency: SubscriptionFrequency;
-  debitType: DebitType;
+  frequency?: SubscriptionFrequency;
+  debitType?: DebitType;
 }
 
-export interface CollectionSchedule {
-  type: CollectionType;
-  frequency?: string;
-  entries?: CollectionEntry[];
-  amount?: string;
+export interface CollectionRequestResponse {
+  data: CollectionResponse;
+  sucess: boolean;
 }
 
 export interface CollectionEntry {
@@ -244,6 +253,7 @@ export interface PII {
 export interface PayWithMonaCollectionsContextType {
   showModal: (
     requestId: string,
+    collection: CollectionResponse,
     onSuccess?: () => void,
     onError?: () => void
   ) => void;

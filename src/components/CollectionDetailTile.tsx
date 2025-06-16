@@ -1,11 +1,6 @@
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  type ImageSourcePropType,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Row from './Row';
+import type { ReactNode } from 'react';
 
 const CollectionDetailTile = ({
   title,
@@ -14,11 +9,12 @@ const CollectionDetailTile = ({
 }: {
   title: string;
   subtitle: string;
-  icon: ImageSourcePropType;
+  icon: ReactNode;
 }) => {
   return (
     <Row style={styles.container}>
-      <Image source={icon} style={styles.icon} />
+      {/* <Image source={icon} style={styles.icon} /> */}
+      {icon}
       <View>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
@@ -39,12 +35,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 10,
     fontWeight: '300',
+    overflow: 'hidden',
   },
   subtitle: {
     fontSize: 14,
     fontWeight: '500',
     lineHeight: 20,
     letterSpacing: -0.48,
+    overflow: 'hidden',
   },
 });
 

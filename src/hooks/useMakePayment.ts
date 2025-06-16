@@ -88,7 +88,6 @@ const useMakePayment = ({
               ...payload,
             },
             onTaskUpdate: (task) => {
-              console.log('🔑 Task:', task);
               if (
                 [
                   TaskType.ENTRY,

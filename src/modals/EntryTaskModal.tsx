@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, Keyboard } from 'react-native';
-import { MonaColors } from '../utils/config';
+import { MonaColors } from '../utils/theme';
 import {
   useState,
   useRef,
@@ -11,6 +11,7 @@ import {
 import MonaButton from '../components/MonaButton';
 import { TaskType, type ModalType, type PinEntryTask } from '../types';
 import MonaModal from './MonaModal';
+import { OtpInput } from 'react-native-otp-entry';
 
 const EntryTaskModal = forwardRef(
   (
@@ -19,13 +20,13 @@ const EntryTaskModal = forwardRef(
       onSubmit,
     }: {
       pinEntryTask: PinEntryTask;
-      onSubmit: (pin: string) => void;
+      onSubmit: (data: string) => void;
     },
     ref: ForwardedRef<ModalType>
   ) => {
     const PIN_LENGTH = pinEntryTask.fieldLength ?? 4;
     const [pin, setPin] = useState('');
-    const [focusedIndex, setFocusedIndex] = useState(0);
+    const [_, setFocusedIndex] = useState(0);
     const [showModal, setShowModal] = useState<boolean>(false);
 
     const open = () => {
@@ -73,24 +74,24 @@ const EntryTaskModal = forwardRef(
     };
 
     // Handle backspace for removing digits
-    const handleKeyPress = (e: any, index: number) => {
-      if (
-        e.nativeEvent.key === 'Backspace' &&
-        pin.length > 0 &&
-        index > 0 &&
-        !pin[index]
-      ) {
-        // Remove the last digit
-        const newPin = pin.slice(0, pin.length - 1);
-        setPin(newPin);
+    // const handleKeyPress = (e: any, index: number) => {
+    //   if (
+    //     e.nativeEvent.key === 'Backspace' &&
+    //     pin.length > 0 &&
+    //     index > 0 &&
+    //     !pin[index]
+    //   ) {
+    //     // Remove the last digit
+    //     const newPin = pin.slice(0, pin.length - 1);
+    //     setPin(newPin);
 
-        // Move focus backward
-        if (index > 0) {
-          inputRefs.current[index - 1]?.focus();
-          setFocusedIndex(index - 1);
-        }
-      }
-    };
+    //     // Move focus backward
+    //     if (index > 0) {
+    //       inputRefs.current[index - 1]?.focus();
+    //       setFocusedIndex(index - 1);
+    //     }
+    //   }
+    // };
 
     // Clear pin
     const clearPin = () => {
@@ -100,13 +101,13 @@ const EntryTaskModal = forwardRef(
     };
 
     // Focus handling
-    const handleFocus = (index: number) => {
-      setFocusedIndex(index);
+    // const handleFocus = (index: number) => {
+    //   setFocusedIndex(index);
 
-      if (index > pin.length) {
-        inputRefs.current[pin.length]?.focus();
-      }
-    };
+    //   if (index > pin.length) {
+    //     inputRefs.current[pin.length]?.focus();
+    //   }
+    // };
 
     const handleClose = () => {
       clearPin();
@@ -126,11 +127,37 @@ const EntryTaskModal = forwardRef(
         <Text style={styles.sheetContent}>{pinEntryTask.taskDescription}</Text>
 
         <View style={styles.pinInputContainer}>
-          {Array.from({ length: PIN_LENGTH }).map((_, index) => {
+          <OtpInput
+            numberOfDigits={PIN_LENGTH}
+            focusColor={MonaColors.secondary}
+            autoFocus={true}
+            hideStick={true}
+            blurOnFilled={true}
+            type="numeric"
+            secureTextEntry={true}
+            focusStickBlinkingDuration={500}
+            onFocus={() => console.log('Focused')}
+            onBlur={() => console.log('Blurred')}
+            onTextChange={handlePinChange}
+            onFilled={(text) => console.log(`OTP is ${text}`)}
+            theme={{
+              containerStyle: styles.pinInputContainer,
+              pinCodeContainerStyle: styles.pinInput,
+              pinCodeTextStyle: styles.pinText,
+              focusStickStyle: styles.pinInputFocused,
+              //   focusedPinCodeContainerStyle: styles.activePinCodeContainer,
+              //   placeholderTextStyle: styles.placeholderText,
+              //   filledPinCodeContainerStyle: styles.filledPinCodeContainer,
+              //   disabledPinCodeContainerStyle:
+              //     styles.disabledPinCodeContainer,
+            }}
+          />
+          {/* {Array.from({ length: PIN_LENGTH }).map((_, index) => {
             const isFocused = focusedIndex === index;
-            const digit = pin[index] || '';
+            const digit = pin[index] || '0';
 
             return (
+              
               <TextInput
                 key={index}
                 ref={(ref) => {
@@ -158,7 +185,7 @@ const EntryTaskModal = forwardRef(
                 caretHidden={true}
               />
             );
-          })}
+          })} */}
         </View>
 
         <MonaButton
@@ -200,7 +227,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     backgroundColor: MonaColors.white,
     borderRadius: 8,
-    paddingVertical: 30,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+  },
+  pinText: {
+    fontSize: 18,
+    fontWeight: 500,
+    lineHeight: 24,
+    letterSpacing: -0.03,
   },
   pinInput: {
     fontSize: 18,

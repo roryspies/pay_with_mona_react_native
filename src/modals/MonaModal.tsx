@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { MonaColors } from '../utils/config';
+import { MonaColors } from '../utils/theme';
 
 const MonaModal = ({
   children,
@@ -59,7 +59,9 @@ const MonaModal = ({
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            <View style={styles.topBar}>
+            <View
+              style={[styles.topBar, { backgroundColor: MonaColors.primary }]}
+            >
               <Image
                 source={require('../assets/city_bg.png')}
                 style={styles.logo}
@@ -114,7 +116,6 @@ const styles = StyleSheet.create({
   },
   topBar: {
     height: 36,
-    backgroundColor: MonaColors.primary,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     marginBottom: 10,

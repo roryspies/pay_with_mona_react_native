@@ -6,10 +6,10 @@ import {
   type ImageSourcePropType,
   useAnimatedValue,
 } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import MonaModal from '../MonaModal';
 import { TransactionStatus } from '../../utils/enums';
-import { MonaColors } from '../../utils/config';
+import { MonaColors } from '../../utils/theme';
 
 const TransactionInitiatedModal = ({
   visible,
@@ -22,8 +22,6 @@ const TransactionInitiatedModal = ({
   transactionStatus: TransactionStatus;
   onDone?: () => void;
 }) => {
-  console.log('initiated status', transactionStatus);
-
   const progressBar1AnimatedValue = useAnimatedValue(0);
   const progressBar2AnimatedValue = useAnimatedValue(0);
   const progressBar3AnimatedValue = useAnimatedValue(0);
@@ -32,7 +30,7 @@ const TransactionInitiatedModal = ({
   const opacity2 = useAnimatedValue(0);
   const [showProgressBar2, setShowProgressBar2] = useState(false);
 
-  const startShimmerAnimation = () => {
+  const startShimmerAnimation = useCallback(() => {
     Animated.loop(
       Animated.timing(shimmerAnim, {
         toValue: 1,
@@ -40,9 +38,9 @@ const TransactionInitiatedModal = ({
         useNativeDriver: false,
       })
     ).start();
-  };
+  }, [shimmerAnim]);
 
-  const startInitialProgressAnimation = () => {
+  const startInitialProgressAnimation = useCallback(() => {
     setShowProgressBar2(false);
 
     Animated.timing(progressBar1AnimatedValue, {
@@ -64,9 +62,9 @@ const TransactionInitiatedModal = ({
         ).start();
       });
     });
-  };
+  }, [opacity, progressBar1AnimatedValue, shimmerAnim]);
 
-  const startCompletionAnimation = () => {
+  const startCompletionAnimation = useCallback(() => {
     progressBar1AnimatedValue.setValue(1);
     opacity.setValue(1);
     setShowProgressBar2(true);
@@ -90,7 +88,14 @@ const TransactionInitiatedModal = ({
         });
       });
     });
-  };
+  }, [
+    onDone,
+    opacity,
+    progressBar1AnimatedValue,
+    progressBar2AnimatedValue,
+    opacity2,
+    progressBar3AnimatedValue,
+  ]);
 
   useEffect(() => {
     const isProgressStatus = [
@@ -107,7 +112,12 @@ const TransactionInitiatedModal = ({
     } else {
       startCompletionAnimation();
     }
-  }, [transactionStatus]);
+  }, [
+    startCompletionAnimation,
+    startInitialProgressAnimation,
+    startShimmerAnimation,
+    transactionStatus,
+  ]);
 
   // useEffect(() => {
   //   if (

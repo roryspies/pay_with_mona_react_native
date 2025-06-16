@@ -10,10 +10,12 @@ import {
 import CircularAvatar from './CircularAvatar';
 import SizedBox from './SizedBox';
 import Column from './Column';
-import { MonaColors } from '../utils/config';
 import type { BankOptions } from '../types';
 import { PaymentMethod } from '../utils/enums';
 import { useEffect, useMemo } from 'react';
+import BankIcon from './icons/Bank';
+import CardIcon from './icons/Card';
+import { MonaColors } from '../utils/theme';
 
 const BankOptionsTile = ({
   title,
@@ -45,7 +47,7 @@ const BankOptionsTile = ({
       duration: 300,
       useNativeDriver: false,
     }).start();
-  }, [isSelected]);
+  }, [isSelected, animatedValue]);
 
   const subtitlePrefix = useMemo(() => {
     if (paymentMethod === PaymentMethod.SAVEDCARD) {
@@ -59,45 +61,44 @@ const BankOptionsTile = ({
 
   return (
     <Pressable
-      onPress={() => onPress?.(paymentMethod, bank)}
+      onPress={() => (bank?.activeIn ? {} : onPress?.(paymentMethod, bank))}
       style={styles.container}
     >
       <View style={styles.leftContent}>
         {(paymentMethod === PaymentMethod.SAVEDCARD ||
-          paymentMethod === PaymentMethod.SAVEDBANK) && (
+          paymentMethod === PaymentMethod.SAVEDBANK ||
+          bank?.logo != null) && (
           <CircularAvatar size={36}>
             <Image source={{ uri: bank!.logo }} style={styles.logo} />
             <CircularAvatar
               size={14}
               backgroundColor={MonaColors.white}
-              style={{
-                position: 'absolute',
-                bottom: -2,
-                right: -2,
-                borderRadius: 12 / 2,
-              }}
+              style={styles.smallAvatar}
             >
               <Image
                 source={
                   paymentMethod === PaymentMethod.SAVEDCARD
-                    ? require('../assets/card_icon.png')
-                    : require('../assets/bank_icon.png')
+                    ? require('../assets/cards.png')
+                    : require('../assets/bank-icon.png')
                 }
-                style={{ width: 10, height: 10 }}
+                style={styles.smallIcon}
               />
             </CircularAvatar>
           </CircularAvatar>
         )}
         {(paymentMethod === PaymentMethod.TRANSFER ||
           paymentMethod === PaymentMethod.CARD) && (
-          <Image
-            source={
-              paymentMethod === PaymentMethod.CARD
-                ? require('../assets/card.png')
-                : require('../assets/money.png')
-            }
-            style={styles.icon}
-          />
+          <CircularAvatar
+            size={36}
+            style={{ backgroundColor: 'rgba(0, 100, 0, 1, 0.1)' }}
+          >
+            {paymentMethod === PaymentMethod.TRANSFER && (
+              <BankIcon style={styles.icon} />
+            )}
+            {paymentMethod === PaymentMethod.CARD && (
+              <CardIcon style={styles.icon} />
+            )}
+          </CircularAvatar>
         )}
         <SizedBox width={20} />
         <Column>
@@ -110,10 +111,7 @@ const BankOptionsTile = ({
           </Text>
         </Column>
       </View>
-      {!trailing && hasRadio && (
-        // <View style={[styles.radio, isSelected && styles.radioSelected]}>
-        //   {isSelected && <View style={styles.radioInner} />}
-        // </View>
+      {!trailing && hasRadio && !bank?.activeIn && (
         <Animated.View
           style={[
             styles.radio,
@@ -123,7 +121,7 @@ const BankOptionsTile = ({
                 outputRange: ['#F2F2F3', MonaColors.primary],
               }),
             },
-            isSelected && styles.radioSelected,
+            isSelected && { borderColor: MonaColors.primary },
           ]}
         >
           <Animated.View
@@ -139,6 +137,11 @@ const BankOptionsTile = ({
           />
         </Animated.View>
       )}
+      {!trailing && bank?.activeIn && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>Active in {bank.activeIn} hours</Text>
+        </View>
+      )}
       {trailing}
     </Pressable>
   );
@@ -149,7 +152,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  leftContent: { flexDirection: 'row' },
+  leftContent: {
+    flexDirection: 'row',
+  },
   title: {
     fontSize: 14,
     fontWeight: '500',
@@ -161,8 +166,24 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 20,
   },
+
+  badge: {
+    backgroundColor: '#E7E8E6',
+    borderRadius: 8,
+    height: 24,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 16,
+    letterSpacing: -0.48,
+    color: '#C6C7C3',
+  },
   radio: {
-    // borderColor: '#F2F2F3',
     borderWidth: 1,
     borderRadius: 50,
     height: 24,
@@ -170,13 +191,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioSelected: {
-    borderColor: MonaColors.primary,
-  },
   radioInner: {
     height: 12,
     width: 12,
-    // backgroundColor: MonaColors.primary,
     borderRadius: 50,
   },
   bankDetails: {
@@ -189,6 +206,16 @@ const styles = StyleSheet.create({
   logo: {
     width: 36,
     height: 36,
+  },
+  smallAvatar: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    borderRadius: 12 / 2,
+  },
+  smallIcon: {
+    width: 10,
+    height: 10,
   },
 });
 

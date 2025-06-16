@@ -259,10 +259,9 @@ export class ApiService {
 
       // Handle network errors or other exceptions
       const message =
-        error instanceof Error ? error.message : 'Unknown error occurred';
-      if (__DEV__) {
-        console.log(`Error: ${message}`);
-      }
+        error instanceof Error
+          ? (error?.message ?? 'Unknown error occurred')
+          : 'Unknown error occurred';
 
       throw new ApiError(message, 0);
     }

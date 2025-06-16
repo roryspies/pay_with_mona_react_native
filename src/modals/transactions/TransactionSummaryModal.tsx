@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import MonaModal from '../MonaModal';
 import MonaButton from '../../components/MonaButton';
 import CircularAvatar from '../../components/CircularAvatar';
-import { MonaColors } from '../../utils/config';
+import { MonaColors } from '../../utils/theme';
 
 const TransactionFailedModal = ({
   visible,

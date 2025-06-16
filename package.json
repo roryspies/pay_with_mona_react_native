@@ -75,6 +75,7 @@
     "@release-it/conventional-changelog": "^9.0.2",
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^29.5.5",
+    "@types/node-forge": "^1.3.11",
     "@types/react": "^19.0.0",
     "commitlint": "^19.6.1",
     "del-cli": "^5.1.0",
@@ -96,7 +97,8 @@
     "react-native": "*",
     "react-native-biometrics": "*",
     "react-native-custom-tabs": "https://github.com/cscoderr/react-native-custom-tabs.git",
-    "react-native-mmkv": "*"
+    "react-native-mmkv": "*",
+    "react-native-svg": "*"
   },
   "workspaces": [
     "example"
@@ -172,8 +174,10 @@
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
+    "node-forge": "^1.3.1",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-sse": "^1.2.1",
-    "react-native-uuid": "^2.0.3"
+    "react-native-uuid": "^2.0.3",
+    "react-native-otp-entry": "^1.8.4"
   }
 }

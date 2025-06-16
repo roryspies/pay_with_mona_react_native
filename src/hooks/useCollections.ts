@@ -1,11 +1,9 @@
 import { useCallback, useState } from 'react';
 import { collectionService } from '../services/CollectionService';
-import { usePayWithMonaCollections } from '../PayWithMonaCollectionsProvider';
+import { usePayWithMonaCollections } from '../provider/PayWithMonaCollectionsContext';
 import { generateSessionId } from '../utils/helpers';
-import { ApiError } from '../services/ApiService';
 import { FirebaseSSE } from '../services/FirebaseSSEStream';
 import ReactNativeCustomTabs from 'react-native-custom-tabs';
-
 const useCollections = ({
   onSuccess,
   onError,
@@ -20,6 +18,8 @@ const useCollections = ({
     async ({ accessRequestId }: { accessRequestId: string }) => {
       try {
         setLoading(true);
+        const collection =
+          await collectionService.fetchColletionWithId(accessRequestId);
         const sessionId = generateSessionId();
 
         await FirebaseSSE.listenToAuthnEvents(sessionId, {
@@ -42,9 +42,12 @@ const useCollections = ({
         });
 
         if (!hasKey) return;
-        showModal(accessRequestId, onSuccess);
+        console.log('Has Actually Key here', hasKey, collection);
+        showModal(accessRequestId, collection, onSuccess);
       } catch (e) {
-        if (e instanceof ApiError) {
+        if (e instanceof Error) {
+          console.log(e);
+
           setError(e.message);
           onError?.(Error(e.message));
         } else {
@@ -55,7 +58,7 @@ const useCollections = ({
         setLoading(false);
       }
     },
-    [onHandleAuthUpdate, showModal, onSuccess]
+    [onHandleAuthUpdate, showModal, onSuccess, onError]
   );
   return { error, loading, initiate };
 };
