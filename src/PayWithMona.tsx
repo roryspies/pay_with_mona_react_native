@@ -1,4 +1,4 @@
-import { ActivityIndicator, Text } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import Column from './components/Column';
 import SizedBox from './components/SizedBox';
 import MonaButton from './components/MonaButton';
@@ -12,7 +12,6 @@ import React, {
 } from 'react';
 import BankOptionsTile from './components/BankOptionsTile';
 import { PaymentMethod, TransactionStatus } from './utils/enums';
-import { styles } from './styles';
 import {
   TaskType,
   type BankOptions,
@@ -29,12 +28,15 @@ import TransactionSuccessModal from './modals/transactions/TransactionSuccessMod
 import TransactionFailedModal from './modals/transactions/TransactionFailedModal';
 import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
 import KeyExchangeConfirmationModal from './modals/KeyExchangeConfirmationModal';
-import { clearMonaSdkState, isAuthenticated } from './utils/helpers';
+import {
+  clearMonaSdkState,
+  encryptRequestData,
+  isAuthenticated,
+} from './utils/helpers';
 import { monaService } from './services/MonaService';
 import { paymentServices } from './services/PaymentService';
 import { useValidatePII } from './hooks/useValidatePII';
-import { FirebaseSSE } from './services/FirebaseSSEStream';
-import ReactNativeCustomTabs from 'react-native-custom-tabs';
+import { MonaColors } from './utils/theme';
 
 interface ModalState {
   showInitiated: boolean;
@@ -73,6 +75,8 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   } = config;
   const keyExchangeModalRef = useRef<ModalType>(null);
   const entryTaskModalRef = useRef<ModalType>(null);
+  const paymentMethodRef = useRef<PaymentMethod>(null);
+  const [paylod, setPayload] = useState({});
   const [modalState, setModalState] = useState({
     showInitiated: false,
     showSuccess: false,
@@ -139,19 +143,32 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     monaService.initialize(merchantKey);
   }, [merchantKey]);
 
-  const handleTransactionUpdate = useCallback(
-    (status: TransactionStatus) => {
-      console.log('getting status', status);
+  useEffect(() => {
+    paymentMethodRef.current = paymentState.paymentMethod;
+  }, [paymentState.paymentMethod]);
 
-      handleSetPaymentState({ transactionStatus: status });
+  //TODO! Somehow this can't access the state outside listner
+  //TODO! Check if this is an issue or just the normal behavior
+  const handleTransactionUpdate = useCallback(
+    (status: TransactionStatus, paymentMethod: PaymentMethod | null) => {
+      const isSavedOption =
+        paymentMethod === PaymentMethod.SAVEDBANK ||
+        paymentMethod === PaymentMethod.SAVEDCARD;
+
+      if (!isSavedOption) {
+        onTransactionUpdate?.(status);
+      } else {
+        handleSetPaymentState({ transactionStatus: status });
+      }
       if (
-        status === TransactionStatus.INITIATED ||
-        status === TransactionStatus.PROGRESSUPDATE
+        (status === TransactionStatus.INITIATED ||
+          status === TransactionStatus.PROGRESSUPDATE) &&
+        isSavedOption
       ) {
         handleSetModalState({ showInitiated: true });
       }
     },
-    [handleSetModalState, handleSetPaymentState]
+    [handleSetModalState, handleSetPaymentState, onTransactionUpdate]
   );
 
   const { initializeEvent } = useInitializePayment({
@@ -161,13 +178,23 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       if (!event.data.event) {
         return;
       }
-      handleTransactionUpdate(event.data.event);
+      console.log(
+        'Payment method needed here!!!',
+        paymentState,
+        paymentState.paymentMethod
+      );
+      handleTransactionUpdate(event.data.event, paymentMethodRef.current);
     },
     onTransactionUpdate: (event) => {
       if (!event.data.event) {
         return;
       }
-      handleTransactionUpdate(event.data.event);
+      console.log(
+        'Payment method needed here!!!',
+        paymentState,
+        paymentState.paymentMethod
+      );
+      handleTransactionUpdate(event.data.event, paymentMethodRef.current);
     },
   });
 
@@ -197,7 +224,8 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         handleSetLoadingState('main', false);
       }
     },
-    [handleSetLoadingState, handleSetPaymentState]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   const signAndMakePaymentRequest = useCallback(async () => {
@@ -242,6 +270,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       onError?.(e as Error);
     }
   }, [
+    onError,
     handleSetLoadingState,
     handleSetPaymentState,
     initializeEvent,
@@ -255,7 +284,9 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     paymentMethod: paymentState.paymentMethod,
     merchantKey,
     onEntryTaskUpdate: (entryTask: PinEntryTask | null) => {
+      console.log('🔑 entryTask:', entryTask);
       handleSetPaymentState({ entryTask: entryTask });
+      setTimeout(() => entryTaskModalRef.current?.open(), 200);
     },
     handleAuthEventUpdate: handleAuthEventUpdate,
     handleCloseEventUpdate: () => validatePII(),
@@ -271,9 +302,9 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
     return () => {
       // ✅ Clean up subscriptions and listeners
-      FirebaseSSE.disconnectAll();
+      // FirebaseSSE.disconnectAll();
       // ✅ Close any open browser tabs
-      ReactNativeCustomTabs.close();
+      // ReactNativeCustomTabs.close();
       // ✅ Clear sdk data
       clearMonaSdkState();
       //Other clean ups
@@ -378,17 +409,29 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         <EntryTaskModal
           ref={entryTaskModalRef}
           pinEntryTask={paymentState.entryTask}
-          onSubmit={(pin) => {
+          onSubmit={async (data) => {
+            let requestPayload;
+            if (
+              paymentState.entryTask?.fieldName != null &&
+              (paymentState.entryTask?.fieldType === TaskType.OTP ||
+                paymentState.entryTask?.fieldType === TaskType.PIN)
+            ) {
+              const isEncrypted = paymentState.entryTask.encrypted;
+              const encryptedData = await encryptRequestData(data);
+              requestPayload = {
+                ...paylod,
+                [paymentState.entryTask.fieldName]: isEncrypted
+                  ? encryptedData
+                  : data,
+              };
+              setPayload(requestPayload);
+            } else {
+              requestPayload = undefined;
+            }
+
             handlePayment({
               isOneTap: true,
-              payload:
-                paymentState.entryTask?.fieldName != null &&
-                (paymentState.entryTask?.fieldType == TaskType.OTP ||
-                  paymentState.entryTask?.fieldType == TaskType.PIN)
-                  ? {
-                      [paymentState.entryTask.fieldName]: pin,
-                    }
-                  : undefined,
+              payload: requestPayload,
             });
           }}
         />
@@ -427,8 +470,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
           setVisible={(value) => handleSetModalState({ showInitiated: value })}
           transactionStatus={paymentState.transactionStatus}
           onDone={() => {
-            console.log('on done called!!!');
-
             if (
               paymentState.transactionStatus === TransactionStatus.COMPLETED
             ) {
@@ -438,8 +479,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
             ) {
               handleSetModalState({ showFailure: true });
             }
-            console.log('OnDone status', paymentState.transactionStatus);
-
             handleSetModalState({ showInitiated: false });
           }}
         />
@@ -502,8 +541,8 @@ const SavedPaymentOptionsList = ({
                 bankOptions?.bankId === bank.bankId
               }
               paymentMethod={PaymentMethod.SAVEDCARD}
-              onPress={(paymentMethod, bankOptions) =>
-                onSelected(bankOptions!, paymentMethod!)
+              onPress={(selectedPaymentMethod, selectedBankOptions) =>
+                onSelected(selectedBankOptions!, selectedPaymentMethod!)
               }
             />
             <SizedBox height={20} />
@@ -520,8 +559,8 @@ const SavedPaymentOptionsList = ({
                 bankOptions?.bankId === bank.bankId
               }
               paymentMethod={PaymentMethod.SAVEDBANK}
-              onPress={(paymentMethod, bankOptions) =>
-                onSelected(bankOptions!, paymentMethod!)
+              onPress={(selectedPaymentMethod, selectedBankOptions) =>
+                onSelected(selectedBankOptions!, selectedPaymentMethod!)
               }
             />
             <SizedBox height={20} />
@@ -530,5 +569,18 @@ const SavedPaymentOptionsList = ({
     </>
   );
 };
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: MonaColors.white,
+    padding: 20,
+  },
+  mainTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    lineHeight: 20,
+  },
+});
 
 export default memo(PayWithMona);

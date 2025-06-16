@@ -14,7 +14,7 @@ npm install pay-with-mona-react-native
 
 Additionally, ensure that the peer dependencies are installed by running:
 ```sh
-npm install @react-native-cookies/cookies react-native-biometrics react-native-custom-tabs @react-native-async-storage/async-storage
+npm install @react-native-cookies/cookies react-native-biometrics react-native-custom-tabs @react-native-async-storage/async-storage react-native-svg
 ```
 
 ## Usage

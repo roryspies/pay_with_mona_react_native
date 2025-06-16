@@ -7,7 +7,7 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
-import { MonaColors } from '../utils/config';
+import { MonaColors } from '../utils/theme';
 import Row from './Row';
 
 const MonaButton = ({
@@ -32,7 +32,8 @@ const MonaButton = ({
       style={[
         styles.container,
         style,
-        enabled && !isLoading ? { opacity: 1 } : { opacity: 0.5 },
+        enabled && !isLoading ? styles.enabled : styles.disabled,
+        { backgroundColor: MonaColors.primary },
       ]}
       activeOpacity={0.9}
       disabled={!enabled || isLoading}
@@ -44,32 +45,10 @@ const MonaButton = ({
         <Row>
           <Text style={styles.text}>{text}</Text>
           {imageUrl != null && subText != null && (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <View
-                style={{
-                  width: 1,
-                  height: 26,
-                  marginHorizontal: 10,
-                  backgroundColor: MonaColors.white,
-                }}
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Image
-                  source={{ uri: imageUrl }}
-                  style={{ width: 24, height: 24, marginRight: 5 }}
-                />
+            <View style={styles.imageContainer}>
+              <View style={styles.divider} />
+              <View style={styles.subTextContainer}>
+                <Image source={{ uri: imageUrl }} style={styles.image} />
                 <Text style={styles.subText}>{subText}</Text>
               </View>
             </View>
@@ -82,11 +61,16 @@ const MonaButton = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: MonaColors.primary,
     height: 52,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  enabled: {
+    opacity: 1,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   text: {
     fontSize: 14,
@@ -105,6 +89,27 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#fff',
     padding: 20,
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  divider: {
+    width: 1,
+    height: 26,
+    marginHorizontal: 10,
+    backgroundColor: MonaColors.white,
+  },
+  subTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  image: {
+    width: 24,
+    height: 24,
+    marginRight: 5,
   },
 });
 

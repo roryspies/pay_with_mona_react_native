@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import MonaModal from './MonaModal';
 import MonaButton from '../components/MonaButton';
-import { MonaColors } from '../utils/config';
+import { MonaColors } from '../utils/theme';
 import type { BankOptions } from '../types';
 import BankOptionsTile from '../components/BankOptionsTile';
 import SizedBox from '../components/SizedBox';
@@ -40,7 +40,9 @@ const TransactionConfirmationModal = ({
         onPress={() => onChange?.()}
         trailing={
           <View style={styles.changeContainer}>
-            <Text style={styles.changeText}>Change</Text>
+            <Text style={[styles.changeText, { color: MonaColors.primary }]}>
+              Change
+            </Text>
             <Image
               source={require('../assets/arrow_right.png')}
               style={styles.arrowRightIcon}
@@ -101,7 +103,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: -0.48,
     lineHeight: 16,
-    color: MonaColors.primary,
   },
   arrowRightIcon: {
     width: 12,

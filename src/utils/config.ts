@@ -11,16 +11,3 @@ export const StorageKeys = {
 };
 
 export const CLIENT_TYPE = 'bioApp';
-export const MonaColors = {
-  bgGrey: '#F2F2F3',
-  white: '#FFFFFF',
-  textHeading: '#131503',
-  textBody: '#6A6C60',
-  primary: '#3045FB',
-  secondary: '#FE7048',
-  textInput: '#F7F7F8',
-  hintText: '#999999',
-  error: '#DE102A',
-  success: '#0F973D',
-  neutral: '#E7E8E6',
-};

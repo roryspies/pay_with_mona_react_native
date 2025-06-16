@@ -237,9 +237,10 @@ class PaymentService {
       const monaCheckoutID = this.storage.getString('monaCheckoutID') ?? '';
       const keyID = this.storage.getString('keyID') ?? '';
 
+      console.log('Checkout id', monaCheckoutID);
+
       // If no checkout ID exists, initiate browser-based authentication
       if (monaCheckoutID === '') {
-        // Launch in-app browser for authentication
         const url = buildSdkUrl({
           transactionId,
           sessionId,
@@ -333,7 +334,6 @@ class PaymentService {
         value: monaCheckoutID,
         path: '/',
       });
-      console.log(monaCheckoutID);
 
       const headers: Record<string, string> = {
         'x-client-type': CLIENT_TYPE,
@@ -352,7 +352,6 @@ class PaymentService {
         headers,
         credentials: 'include',
       });
-      console.log(response.status);
 
       // Handle successful response
       if (response.status === 200) {
@@ -361,9 +360,10 @@ class PaymentService {
 
       // Handle authentication challenge responses
       if (response.status === 202 && response.data.task) {
-        console.log('task need!');
-
-        if (response.data.task.taskType === 'sign') {
+        if (
+          response.data.task.taskType === 'sign' ||
+          response.data.task.fieldType === 'sign'
+        ) {
           return await this.makePaymentRequest({
             amount,
             bankId,
@@ -373,11 +373,10 @@ class PaymentService {
             sessionId,
           });
         } else if (
-          ['pin', 'entry', 'otp', 'phone'].includes(
-            response.data.task.fieldType
-          )
+          ['pin', 'entry', 'otp'].includes(response.data.task.fieldType)
         ) {
           onTaskUpdate?.(response.data.task);
+          return;
         }
       }
       throw new Error(`Payment request failed with status: ${response.status}`);

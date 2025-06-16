@@ -10,9 +10,11 @@ import ReactNativeCustomTabs, {
   ViewControllerModalPresentationStyle,
 } from 'react-native-custom-tabs';
 import { MMKV } from 'react-native-mmkv';
-import type { SavedPaymentOptions } from '../types';
+import type { MerchantSettings, SavedPaymentOptions } from '../types';
 import { PaymentMethod } from './enums';
 import React from 'react';
+import forge from 'node-forge';
+import { defaultTheme } from './theme';
 
 export const generateSessionId = (length = 10): string => {
   const chars =
@@ -68,7 +70,6 @@ export const buildSdkUrl = ({
   if (isCollection) {
     return `${PAYMENT_BASE_URL}/collections?loginScope=${merchantKey}&sessionId=${sessionId}`;
   }
-
   if (
     isAuthenticated ||
     paymentMethod === PaymentMethod.TRANSFER ||
@@ -77,8 +78,7 @@ export const buildSdkUrl = ({
     return `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${paymentMethod}&loginScope=${merchantKey}&sessionId=${sessionId}`;
   }
   const redirectUrl = `${PAYMENT_BASE_URL}/${transactionId}?embedding=true&sdk=true&method=${methodParam}&bankId=${bankId || ''}`;
-
-  return `${PAYMENT_BASE_URL}/login?loginScope=${merchantKey}&redirect=${encodeURIComponent(redirectUrl)}&sessionId=${sessionId}`;
+  return `${PAYMENT_BASE_URL}/login?loginScope=${merchantKey}&redirect=${encodeURIComponent(redirectUrl)}&sessionId=${sessionId}&transactionId=${transactionId}`;
 };
 
 export const isAuthenticated = (): boolean => {
@@ -142,6 +142,8 @@ export const generateRequestCurl = (
     curl.push(`-H "${key}: ${value}"`);
   }
 
+  // const cookies = await CookieManager.getAll();
+
   // Body
   if (options.body) {
     const isJson =
@@ -161,10 +163,12 @@ export const generateRequestCurl = (
 
 let monaSdkState: {
   savedPaymentOptions?: SavedPaymentOptions | null;
+  merchantSdk?: MerchantSettings | null;
 } = {};
 
 export const setMonaSdkState = (data: {
   savedPaymentOptions?: SavedPaymentOptions | null;
+  merchantSdk?: MerchantSettings | null;
 }) => {
   monaSdkState = { ...monaSdkState, ...data };
 };
@@ -175,4 +179,36 @@ export const getMonaSdkState = () => {
 
 export const clearMonaSdkState = () => {
   monaSdkState = {};
+};
+
+export const encryptRequestData = async (data: string) => {
+  //TODO!: Create a file for this, or alert the team to send it from server
+  const pemPublicKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApXwFU8YtCfLGnE/YcgRK
+JcL2G8aDM50f5blhgujFeLTrMxhQCLoO9HWOL9zcr+DyjVLxoNWvF2RAfJCWrMkv
+6a3u21W19VkuHCKMsT872QHo2F8U+NmXXwzjIAElYqgUal0/2BHuvG9ko+azvMk2
+RLGK5sZyJKK7iYZN0kosPtrHfEdUXm2eRy/9MKlTTqRx3UmdD4jTlvVEKjIzkKfM
+to26uGrhBC1rGapeSPUHs0EoGXrzFzAn47Ua94Dg7TxlrwfRk2SfsCe7fQLma+mK
+JokqEQibKB1XcWFSa6BoSrqQEdDLLHoASXgW0A3btPsK71v6c7F0E2zNlBV6D9Ka
+aQIDAQAB
+-----END PUBLIC KEY-----`;
+  const key = forge.pki.publicKeyFromPem(pemPublicKey);
+  const encryptedBytes = key.encrypt(data, 'RSA-OAEP');
+  const hex = forge.util.bytesToHex(encryptedBytes);
+
+  return hex;
+};
+
+export const getMerchantColors = (
+  merchant?: MerchantSettings
+): Partial<typeof defaultTheme> => {
+  if (merchant && merchant.colors) {
+    const colors = merchant.colors;
+    console.log('Mona colors', colors.primaryColour);
+    return {
+      primary: colors.primaryColour,
+      //TODO!: Add other colors here
+    };
+  }
+  return defaultTheme;
 };

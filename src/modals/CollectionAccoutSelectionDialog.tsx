@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import MonaModal from './MonaModal';
 import MonaButton from '../components/MonaButton';
 import CircularAvatar from '../components/CircularAvatar';
-import { MonaColors, PAYMENT_BASE_URL } from '../utils/config';
+import { PAYMENT_BASE_URL } from '../utils/config';
 import SizedBox from '../components/SizedBox';
 import type { BankOptions, ModalType, SavedPaymentOptions } from '../types';
 import BankOptionsTile from '../components/BankOptionsTile';
@@ -13,8 +13,10 @@ import {
   useState,
   type ForwardedRef,
 } from 'react';
-import Row from '../components/Row';
 import { launchSdkUrl } from '../utils/helpers';
+import { MonaColors } from '../utils/theme';
+import DirectionsIcon from '../components/icons/Directions';
+import BankIcon from '../components/icons/Bank';
 
 const CollectionAccountSelectionDialog = forwardRef(
   (
@@ -48,26 +50,18 @@ const CollectionAccountSelectionDialog = forwardRef(
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <CircularAvatar size={48} backgroundColor={'#3045FB1A'}>
-              <Image
-                source={require('../assets/collection_bank.png')}
+              <BankIcon
+                // source={require('../assets/bank.png')}
                 style={styles.headerLogo}
               />
             </CircularAvatar>
-            <Image
-              source={require('../assets/directions.png')}
-              style={{
-                width: 22,
-                height: 22,
-              }}
+            <DirectionsIcon
+              // source={require('../assets/directions.png')}
+              style={styles.directionsIcon}
             />
             <Image
-              source={require('../assets/ng_deals_logo.png')}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 50,
-                resizeMode: 'cover',
-              }}
+              source={require('../assets/logo.png')}
+              style={styles.logoImage}
             />
           </View>
           <Text style={styles.title}>Select Payment Account</Text>
@@ -77,8 +71,10 @@ const CollectionAccountSelectionDialog = forwardRef(
           </Text>
           {savedPaymentOptions?.bank != null &&
             savedPaymentOptions?.bank.map((value) => {
+              //TODO: This is not advisable
+              //TODO: This is Implemented based on what they have Flutter
               //TODO! Alert them on backend to creeat an endpoint specific to collection
-              //Implemented based on what they have Flutter
+
               if (
                 value.bankName!.toLowerCase().includes('opay') ||
                 value.bankName!.toLowerCase().includes('palm') ||
@@ -107,15 +103,13 @@ const CollectionAccountSelectionDialog = forwardRef(
               const url = `${PAYMENT_BASE_URL}/collections/enrollment?collectionId=${accessRequestId}`;
               await launchSdkUrl(url);
             }}
+            style={styles.addAccountButton}
           >
-            <Row style={{ flex: 0 }}>
-              <Image
-                source={require('../assets/add.png')}
-                style={{ width: 20, height: 20 }}
-              />
-
-              <Text style={styles.textButtonText}>Add Account</Text>
-            </Row>
+            <Image
+              source={require('../assets/add.png')}
+              style={styles.addIcon}
+            />
+            <Text style={styles.textButtonText}>Add Account</Text>
           </Pressable>
           <SizedBox height={10} />
           <MonaButton
@@ -174,8 +168,26 @@ const styles = StyleSheet.create({
     height: 20,
     resizeMode: 'contain',
   },
+  directionsIcon: {
+    width: 22,
+    height: 22,
+  },
+  logoImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 50,
+    resizeMode: 'cover',
+  },
+  addAccountButton: {
+    flexDirection: 'row',
+  },
+  addIcon: {
+    width: 20,
+    height: 20,
+    alignSelf: 'center',
+  },
   textButtonText: {
-    // flex: 1,
+    flex: 1,
     textAlign: 'center',
     textDecorationLine: 'underline',
     fontSize: 14,

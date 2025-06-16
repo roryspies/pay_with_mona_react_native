@@ -1,18 +1,21 @@
 import { monaService } from './services/MonaService';
 import { paymentServices } from './services/PaymentService';
 import type { PIIResponse, SavedPaymentOptions } from './types';
-import { setMonaSdkState } from './utils/helpers';
+import { getMerchantColors, setMonaSdkState } from './utils/helpers';
+import { setMonaColors } from './utils/theme';
 
 export const initialize = async (
   merchantKey: string,
-  savedBankOptions: SavedPaymentOptions
+  savedBankOptions?: SavedPaymentOptions
 ) => {
   monaService.initialize(merchantKey);
   paymentServices.initialize(merchantKey);
   monaService.initialize(merchantKey);
   setMonaSdkState({ savedPaymentOptions: savedBankOptions });
   const response = await monaService.initializeSdk();
-  console.log(response);
+  setMonaSdkState({ merchantSdk: response });
+  const monaColors = getMerchantColors(response);
+  setMonaColors(monaColors);
 };
 
 export const validatePII = async ({

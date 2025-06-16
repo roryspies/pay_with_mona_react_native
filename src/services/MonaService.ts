@@ -1,8 +1,12 @@
 import ReactNativeBiometrics from 'react-native-biometrics';
 import { MMKV } from 'react-native-mmkv';
-import { ApiService } from './ApiService';
+import { ApiError, ApiService } from './ApiService';
 import { BASE_URL, CLIENT_TYPE } from '../utils/config';
-import type { DeviceAuthResponse } from '../types';
+import type {
+  DeviceAuthResponse,
+  MerchantSettings,
+  MerchantSettingsResponse,
+} from '../types';
 import uuid from 'react-native-uuid';
 const Buffer = require('buffer').Buffer;
 
@@ -34,18 +38,23 @@ class MonaService {
     }
   }
 
-  async initializeSdk() {
+  async initializeSdk(): Promise<MerchantSettings> {
     this.ensureInitialized();
     try {
-      const response = await this.api.get('/merchant/sdk', {
-        headers: {
-          'x-client-type': CLIENT_TYPE,
-          'x-public-key': this.merchantKey!,
-        },
-      });
-      console.log(response);
+      const response = await this.api.get<MerchantSettingsResponse>(
+        '/merchant/sdk',
+        {
+          headers: {
+            'x-client-type': CLIENT_TYPE,
+            'x-public-key': this.merchantKey!,
+          },
+        }
+      );
+      return response.data.data;
     } catch (e) {
-      console.log('unable to initialize sdk');
+      throw e instanceof ApiError || e instanceof Error
+        ? e
+        : new Error('Unable to get merchant sdk settings');
     }
   }
 
