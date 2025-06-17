@@ -59,7 +59,7 @@ function App(): React.JSX.Element {
   }, []);
 
   return (
-    <PayWithMonaCollectionsProvider key={key} merchantKey={'mona_pub_5361ecf7'}>
+    <PayWithMonaCollectionsProvider key={key} merchantKey={'mona_pub_c5786bb9'}>
       <NavigationContainer>
         <RootStack />
       </NavigationContainer>
