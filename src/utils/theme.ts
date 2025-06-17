@@ -21,6 +21,7 @@ export const setMonaColors = (colors: Partial<typeof defaultTheme>) => {
 export const getMonaColors = () => MonaColors;
 
 export function withAlpha(hex: string, alpha: number) {
+  const hexClean = hex.replace('#', '');
   const a = Math.round(alpha * 255).toString(16).padStart(2, '0');
-  return `#${a}${hex.replace('#', '')}`;
+  return `#${hexClean}${a}`;
 }

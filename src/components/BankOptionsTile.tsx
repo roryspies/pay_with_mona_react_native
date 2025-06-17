@@ -90,7 +90,7 @@ const BankOptionsTile = ({
           paymentMethod === PaymentMethod.CARD) && (
             <CircularAvatar
               size={36}
-              style={{ backgroundColor: withAlpha(MonaColors.primary, 0.1) }}
+              backgroundColor={withAlpha(MonaColors.primary, 0.1)}
             >
               {paymentMethod === PaymentMethod.TRANSFER && (
                 <BankIcon style={styles.icon} />
