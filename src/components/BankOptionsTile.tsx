@@ -15,7 +15,7 @@ import { PaymentMethod } from '../utils/enums';
 import { useEffect, useMemo } from 'react';
 import BankIcon from './icons/Bank';
 import CardIcon from './icons/Card';
-import { MonaColors } from '../utils/theme';
+import { MonaColors, withAlpha } from '../utils/theme';
 
 const BankOptionsTile = ({
   title,
@@ -68,38 +68,38 @@ const BankOptionsTile = ({
         {(paymentMethod === PaymentMethod.SAVEDCARD ||
           paymentMethod === PaymentMethod.SAVEDBANK ||
           bank?.logo != null) && (
-          <CircularAvatar size={36}>
-            <Image source={{ uri: bank!.logo }} style={styles.logo} />
-            <CircularAvatar
-              size={14}
-              backgroundColor={MonaColors.white}
-              style={styles.smallAvatar}
-            >
-              <Image
-                source={
-                  paymentMethod === PaymentMethod.SAVEDCARD
-                    ? require('../assets/cards.png')
-                    : require('../assets/bank-icon.png')
-                }
-                style={styles.smallIcon}
-              />
+            <CircularAvatar size={36}>
+              <Image source={{ uri: bank!.logo }} style={styles.logo} />
+              <CircularAvatar
+                size={14}
+                backgroundColor={MonaColors.white}
+                style={styles.smallAvatar}
+              >
+                <Image
+                  source={
+                    paymentMethod === PaymentMethod.SAVEDCARD
+                      ? require('../assets/cards.png')
+                      : require('../assets/bank-icon.png')
+                  }
+                  style={styles.smallIcon}
+                />
+              </CircularAvatar>
             </CircularAvatar>
-          </CircularAvatar>
-        )}
+          )}
         {(paymentMethod === PaymentMethod.TRANSFER ||
           paymentMethod === PaymentMethod.CARD) && (
-          <CircularAvatar
-            size={36}
-            style={{ backgroundColor: 'rgba(0, 100, 0, 1, 0.1)' }}
-          >
-            {paymentMethod === PaymentMethod.TRANSFER && (
-              <BankIcon style={styles.icon} />
-            )}
-            {paymentMethod === PaymentMethod.CARD && (
-              <CardIcon style={styles.icon} />
-            )}
-          </CircularAvatar>
-        )}
+            <CircularAvatar
+              size={36}
+              backgroundColor={withAlpha(MonaColors.primary, 0.1)}
+            >
+              {paymentMethod === PaymentMethod.TRANSFER && (
+                <BankIcon style={styles.icon} />
+              )}
+              {paymentMethod === PaymentMethod.CARD && (
+                <CardIcon style={styles.icon} />
+              )}
+            </CircularAvatar>
+          )}
         <SizedBox width={20} />
         <Column>
           <Text style={styles.title} numberOfLines={1}>

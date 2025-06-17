@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import HomeScreen from './features/home/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -48,7 +48,7 @@ const RootStack = () => {
 
 function App(): React.JSX.Element {
   return (
-    <PayWithMonaCollectionsProvider merchantKey={'mona_pub_5361ecf7'}>
+    <PayWithMonaCollectionsProvider merchantKey={'mona_pub_c5786bb9'}>
       <NavigationContainer>
         <RootStack />
       </NavigationContainer>
