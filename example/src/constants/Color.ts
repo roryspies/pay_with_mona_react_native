@@ -1,4 +1,4 @@
-export const Colors = {
+export let Colors = {
   primary: '#3045FB',
   secondary: '#6c757d',
   success: '#28a745',
@@ -12,4 +12,8 @@ export const Colors = {
   gray: '#6c757d',
   neutral: '#E7E8E6',
   transparent: 'transparent',
+};
+
+export const setColors = (newColors: Partial<typeof Colors>) => {
+  Colors = { ...Colors, ...newColors };
 };

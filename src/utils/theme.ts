@@ -14,8 +14,21 @@ export const defaultTheme = {
 
 export let MonaColors = defaultTheme;
 
+type Listener = (colors: typeof defaultTheme) => void;
+const listeners: Listener[] = [];
+
 export const setMonaColors = (colors: Partial<typeof defaultTheme>) => {
   MonaColors = { ...defaultTheme, ...colors };
+  listeners.forEach((cb) => cb(MonaColors));
 };
 
 export const getMonaColors = () => MonaColors;
+
+export const subscribeMonaColors = (cb: Listener) => {
+  listeners.push(cb);
+  // Return a cleanup function to unsubscribe
+  return () => {
+    const idx = listeners.indexOf(cb);
+    if (idx > -1) listeners.splice(idx, 1);
+  };
+};

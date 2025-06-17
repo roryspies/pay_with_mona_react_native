@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import HomeScreen from './features/home/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -9,6 +9,8 @@ import {
   type SavedPaymentOptions,
 } from 'pay-with-mona-react-native';
 import CollectionScheduledScreen from './features/collections/CollectionScheduledScreen';
+import { subscribeMonaColors } from '../../src/utils/theme';
+import { setColors } from './constants/Color';
 
 export type StackParamList = {
   Home: undefined;
@@ -47,8 +49,17 @@ const RootStack = () => {
 };
 
 function App(): React.JSX.Element {
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    return subscribeMonaColors((colors) => {
+      setColors(colors);
+      setKey((prevKey) => prevKey + 1); // Force re-render to apply new colors, don't do this in a production app, use a context instead
+    });
+  }, []);
+
   return (
-    <PayWithMonaCollectionsProvider merchantKey={'mona_pub_5361ecf7'}>
+    <PayWithMonaCollectionsProvider key={key} merchantKey={'mona_pub_5361ecf7'}>
       <NavigationContainer>
         <RootStack />
       </NavigationContainer>
