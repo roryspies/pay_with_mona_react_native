@@ -57,23 +57,23 @@ class FirebaseSSEListener {
   /**
    * Listen to payments events from Firebase
    */
-  public async listenToPaymentEvents(
-    transactionId: string,
-    options: ListenerOptions
-  ): Promise<void> {
-    const streamId = `payment`;
-    const streamUrl = `${this.baseUrl}/public/paymentUpdate/${transactionId}.json`;
+  // public async listenToPaymentEvents(
+  //   transactionId: string,
+  //   options: ListenerOptions
+  // ): Promise<void> {
+  //   const streamId = `payment`;
+  //   const streamUrl = `${this.baseUrl}/public/paymentUpdate/${transactionId}.json`;
 
-    console.log('🔥 Listening to payment events:', transactionId);
+  //   console.log('🔥 Listening to payment events:', transactionId);
 
-    const config: StreamConfig = {
-      url: streamUrl,
-      streamId,
-      options,
-    };
+  //   const config: StreamConfig = {
+  //     url: streamUrl,
+  //     streamId,
+  //     options,
+  //   };
 
-    await this.connectToStream(config);
-  }
+  //   await this.connectToStream(config);
+  // }
 
   /**
    * Listen to transactions events from Firebase

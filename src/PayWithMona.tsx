@@ -174,17 +174,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   const { initializeEvent } = useInitializePayment({
     transactionId,
     onError: onError,
-    onPaymentUpdate: (event) => {
-      if (!event.data.event) {
-        return;
-      }
-      console.log(
-        'Payment method needed here!!!',
-        paymentState,
-        paymentState.paymentMethod
-      );
-      handleTransactionUpdate(event.data.event, paymentMethodRef.current);
-    },
     onTransactionUpdate: (event) => {
       if (!event.data.event) {
         return;
