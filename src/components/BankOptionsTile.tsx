@@ -15,8 +15,7 @@ import { PaymentMethod } from '../utils/enums';
 import { useEffect, useMemo } from 'react';
 import BankIcon from './icons/Bank';
 import CardIcon from './icons/Card';
-import { MonaColors } from '../utils/theme';
-import { withAlpha } from '../../example/src/constants/Color';
+import { MonaColors, withAlpha } from '../utils/theme';
 
 const BankOptionsTile = ({
   title,

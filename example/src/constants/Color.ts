@@ -17,8 +17,3 @@ export let Colors = {
 export const setColors = (newColors: Partial<typeof Colors>) => {
   Colors = { ...Colors, ...newColors };
 };
-
-export function withAlpha(hex: string, alpha: number) {
-  const a = Math.round(alpha * 255).toString(16).padStart(2, '0');
-  return `#${a}${hex.replace('#', '')}`;
-}

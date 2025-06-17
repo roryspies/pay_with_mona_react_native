@@ -9,8 +9,6 @@ import {
   type SavedPaymentOptions,
 } from 'pay-with-mona-react-native';
 import CollectionScheduledScreen from './features/collections/CollectionScheduledScreen';
-import { subscribeMonaColors } from '../../src/utils/theme';
-import { setColors } from './constants/Color';
 
 export type StackParamList = {
   Home: undefined;
@@ -49,17 +47,8 @@ const RootStack = () => {
 };
 
 function App(): React.JSX.Element {
-  const [key, setKey] = useState(0);
-
-  useEffect(() => {
-    return subscribeMonaColors((colors) => {
-      setColors(colors);
-      setKey((prevKey) => prevKey + 1); // Force re-render to apply new colors, don't do this in a production app, use a context instead
-    });
-  }, []);
-
   return (
-    <PayWithMonaCollectionsProvider key={key} merchantKey={'mona_pub_c5786bb9'}>
+    <PayWithMonaCollectionsProvider merchantKey={'mona_pub_c5786bb9'}>
       <NavigationContainer>
         <RootStack />
       </NavigationContainer>
