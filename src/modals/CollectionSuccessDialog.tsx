@@ -10,7 +10,7 @@ import CollectionScheduledView from '../components/CollectionScheduledView';
 import CollectionSubscriptionView from '../components/CollectionSubscriptionView';
 import MonaButton from '../components/MonaButton';
 import SizedBox from '../components/SizedBox';
-import { getMonaSdkState } from '../utils/helpers';
+import { useMonaSdkStore } from '../hooks/useMonaSdkStore';
 
 const CollectionSuccessDialog = (
   {
@@ -25,7 +25,7 @@ const CollectionSuccessDialog = (
     onSubmit?: () => void;
   },
 ) => {
-  const sdkState = getMonaSdkState();
+  const sdkState = useMonaSdkStore();
   const merchant = sdkState.merchantSdk;
   return (
     <View style={styles.container}>

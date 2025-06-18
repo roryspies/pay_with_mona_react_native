@@ -10,7 +10,7 @@ import BankIcon from '../components/icons/Bank';
 import DirectionsIcon from '../components/icons/Directions';
 import MonaButton from '../components/MonaButton';
 import SizedBox from '../components/SizedBox';
-import { getMonaSdkState } from '../utils/helpers';
+import { useMonaSdkStore } from '../hooks/useMonaSdkStore';
 import { MonaColors } from '../utils/theme';
 
 const CollectionConfirmationDialog = (
@@ -24,7 +24,7 @@ const CollectionConfirmationDialog = (
     onSubmit?: () => void;
   }
 ) => {
-  const sdkState = getMonaSdkState();
+  const sdkState = useMonaSdkStore();
   const merchant = sdkState.merchantSdk;
   return (
 

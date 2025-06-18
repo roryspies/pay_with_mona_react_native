@@ -32,11 +32,11 @@ import {
 } from './types';
 import { PaymentMethod, TransactionStatus } from './utils/enums';
 import {
-  clearMonaSdkState,
   encryptRequestData,
   isAuthenticated,
 } from './utils/helpers';
 import { MonaColors } from './utils/theme';
+import { useMonaSdkStore } from './hooks/useMonaSdkStore';
 
 interface LoadingState {
   main: boolean;
@@ -301,7 +301,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       // ✅ Close any open browser tabs
       // ReactNativeCustomTabs.close();
       // ✅ Clear sdk data
-      clearMonaSdkState();
+      useMonaSdkStore.getState().clearMonaSdkState();
       //Other clean ups
       console.log('MPayWithMonayPage unmounted');
     };

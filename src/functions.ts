@@ -1,7 +1,8 @@
+import { useMonaSdkStore } from './hooks/useMonaSdkStore';
 import { monaService } from './services/MonaService';
 import { paymentServices } from './services/PaymentService';
 import type { PIIResponse, SavedPaymentOptions } from './types';
-import { getMerchantColors, setMonaSdkState } from './utils/helpers';
+import { getMerchantColors } from './utils/helpers';
 import { setMonaColors } from './utils/theme';
 
 export const initialize = async (
@@ -11,9 +12,11 @@ export const initialize = async (
   monaService.initialize(merchantKey);
   paymentServices.initialize(merchantKey);
   monaService.initialize(merchantKey);
-  setMonaSdkState({ savedPaymentOptions: savedBankOptions });
+  useMonaSdkStore.getState().setMonaSdkState({
+    savedPaymentOptions: savedBankOptions,
+  });
   const response = await monaService.initializeSdk();
-  setMonaSdkState({ merchantSdk: response });
+  useMonaSdkStore.getState().setMonaSdkState({ merchantSdk: response });
   const monaColors = getMerchantColors(response);
   setMonaColors(monaColors);
 };
@@ -41,4 +44,14 @@ export const validatePII = async ({
     lastName,
     middleName,
   });
+};
+
+export const setMerchantPaymentSettings = async (
+  currentSettings: string,
+  merchantApiKey: string
+) => {
+  return await monaService.updateMerchantPaymentSettings(
+    currentSettings,
+    merchantApiKey
+  );
 };

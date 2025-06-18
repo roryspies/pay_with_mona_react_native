@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { FirebaseSSE, type SSEEvent } from '../services/FirebaseSSEStream';
+
 interface InitializePaymentProps {
   transactionId: string;
   onPaymentUpdate: (event: SSEEvent) => void;

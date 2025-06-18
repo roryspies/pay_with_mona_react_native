@@ -220,7 +220,7 @@ export class ApiService {
       try {
         responseData = await response.json();
       } catch (error) {
-        console.log('Json Error:', error);
+        console.error('Json Error:', error);
       }
 
       if (__DEV__) {
@@ -252,7 +252,7 @@ export class ApiService {
       // Handle fetch errors and timeouts
       if (error instanceof ApiError) {
         if (__DEV__) {
-          console.log(`Error: ${error.message}`);
+          console.error(`Error: ${error.message}`);
         }
         throw error;
       }
