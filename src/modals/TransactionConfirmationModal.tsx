@@ -1,23 +1,18 @@
-import { View, Text, StyleSheet } from 'react-native';
-import MonaModal from './MonaModal';
-import MonaButton from '../components/MonaButton';
-import { MonaColors } from '../utils/theme';
-import type { BankOptions } from '../types';
+import { StyleSheet, Text, View } from 'react-native';
 import BankOptionsTile from '../components/BankOptionsTile';
+import MonaButton from '../components/MonaButton';
 import SizedBox from '../components/SizedBox';
-import ArrowRight from '../components/icons/ArrowRight';
+import type { BankOptions } from '../types';
+import { MonaColors } from '../utils/theme';
+import SvgArrowRight from '../components/icons/ArrowRight';
 
 const TransactionConfirmationModal = ({
-  visible,
-  setVisible,
   amount,
   bank,
   loading,
   onPress,
   onChange,
 }: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
   bank: BankOptions;
   amount: number;
   loading: boolean;
@@ -25,12 +20,7 @@ const TransactionConfirmationModal = ({
   onChange?: () => void;
 }) => {
   return (
-    <MonaModal
-      visible={visible}
-      setVisible={setVisible}
-      backgroundColor={MonaColors.white}
-      usePoweredByMona={true}
-    >
+    <>
       <View style={styles.amountContainer}>
         <Text style={styles.subtitle}>Amount to pay</Text>
         <Text style={styles.amount}>₦{amount}</Text>
@@ -44,7 +34,7 @@ const TransactionConfirmationModal = ({
             <Text style={[styles.changeText, { color: MonaColors.primary }]}>
               Change
             </Text>
-            <ArrowRight width={12} height={12} color={MonaColors.primary} />
+            <SvgArrowRight width={12} height={12} color={MonaColors.primary} />
           </View>
         }
       />
@@ -55,7 +45,7 @@ const TransactionConfirmationModal = ({
         isLoading={loading}
         onPress={() => onPress?.()}
       />
-    </MonaModal>
+    </>
   );
 };
 

@@ -1,24 +1,19 @@
+import { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Animated,
   type ImageSourcePropType,
+  StyleSheet,
+  Text,
   useAnimatedValue,
+  View,
 } from 'react-native';
-import { useCallback, useEffect, useState } from 'react';
-import MonaModal from '../MonaModal';
 import { TransactionStatus } from '../../utils/enums';
 import { MonaColors } from '../../utils/theme';
 
 const TransactionInitiatedModal = ({
-  visible,
-  setVisible,
   transactionStatus,
   onDone,
 }: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
   transactionStatus: TransactionStatus;
   onDone?: () => void;
 }) => {
@@ -200,17 +195,54 @@ const TransactionInitiatedModal = ({
   // }, [transactionStatus]);
 
   return (
-    <MonaModal visible={visible} setVisible={setVisible} hasCloseButton={false}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Hang Tight, We're On It!</Text>
-        <Text style={styles.subtitle}>
-          Your transfer is on the way—we'll confirm as soon as it lands.
-        </Text>
-        <View style={styles.progressBarContainer}>
-          <View style={styles.progressBar1}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Hang Tight, We're On It!</Text>
+      <Text style={styles.subtitle}>
+        Your transfer is on the way—we'll confirm as soon as it lands.
+      </Text>
+      <View style={styles.progressBarContainer}>
+        <View style={styles.progressBar1}>
+          <Animated.View
+            style={{
+              width: progressBar1AnimatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+              height: '100%',
+              backgroundColor: MonaColors.success,
+              borderRadius: 4,
+            }}
+          />
+        </View>
+        <AnimatedTransactionIcon value={opacity} />
+        <View style={styles.progressBar2}>
+          {!showProgressBar2 && (
+            <Animated.View
+              style={[
+                {
+                  //   position: 'absolute',
+                  width: '50%',
+                  height: '100%',
+                  backgroundColor: MonaColors.success,
+                  borderRadius: 4,
+                },
+                {
+                  transform: [
+                    {
+                      translateX: shimmerAnim.interpolate({
+                        inputRange: [-1, 1],
+                        outputRange: ['-100%', '200%'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
+          )}
+          {showProgressBar2 && (
             <Animated.View
               style={{
-                width: progressBar1AnimatedValue.interpolate({
+                width: progressBar2AnimatedValue.interpolate({
                   inputRange: [0, 1],
                   outputRange: ['0%', '100%'],
                 }),
@@ -219,78 +251,39 @@ const TransactionInitiatedModal = ({
                 borderRadius: 4,
               }}
             />
-          </View>
-          <AnimatedTransactionIcon value={opacity} />
-          <View style={styles.progressBar2}>
-            {!showProgressBar2 && (
-              <Animated.View
-                style={[
-                  {
-                    //   position: 'absolute',
-                    width: '50%',
-                    height: '100%',
-                    backgroundColor: MonaColors.success,
-                    borderRadius: 4,
-                  },
-                  {
-                    transform: [
-                      {
-                        translateX: shimmerAnim.interpolate({
-                          inputRange: [-1, 1],
-                          outputRange: ['-100%', '200%'],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
-            {showProgressBar2 && (
-              <Animated.View
-                style={{
-                  width: progressBar2AnimatedValue.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                  }),
-                  height: '100%',
-                  backgroundColor: MonaColors.success,
-                  borderRadius: 4,
-                }}
-              />
-            )}
-          </View>
-          <AnimatedTransactionIcon
-            value={opacity2}
-            icon={
-              transactionStatus === TransactionStatus.FAILED
-                ? require('../../assets/failed.png')
-                : require('../../assets/checkmark.png')
-            }
-            animatedToColor={
-              transactionStatus === TransactionStatus.FAILED
-                ? MonaColors.error
-                : MonaColors.success
-            }
+          )}
+        </View>
+        <AnimatedTransactionIcon
+          value={opacity2}
+          icon={
+            transactionStatus === TransactionStatus.FAILED
+              ? require('../../assets/failed.png')
+              : require('../../assets/checkmark.png')
+          }
+          animatedToColor={
+            transactionStatus === TransactionStatus.FAILED
+              ? MonaColors.error
+              : MonaColors.success
+          }
+        />
+        <View style={styles.progressBar3}>
+          <Animated.View
+            style={{
+              width: progressBar3AnimatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+              height: '100%',
+              backgroundColor:
+                transactionStatus === TransactionStatus.FAILED
+                  ? MonaColors.error
+                  : MonaColors.success,
+              borderRadius: 4,
+            }}
           />
-          <View style={styles.progressBar3}>
-            <Animated.View
-              style={{
-                width: progressBar3AnimatedValue.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0%', '100%'],
-                }),
-                height: '100%',
-                backgroundColor:
-                  transactionStatus === TransactionStatus.FAILED
-                    ? MonaColors.error
-                    : MonaColors.success,
-                borderRadius: 4,
-              }}
-            />
-          </View>
         </View>
       </View>
-    </MonaModal>
+    </View>
   );
 };
 

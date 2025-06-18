@@ -1,21 +1,16 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
-import MonaModal from '../MonaModal';
-import MonaButton from '../../components/MonaButton';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import CircularAvatar from '../../components/CircularAvatar';
+import MonaButton from '../../components/MonaButton';
 import { MonaColors } from '../../utils/theme';
 
 const TransactionSuccessModal = ({
-  visible,
-  setVisible,
   amount,
   hasTimeout = false,
   timeoutDuration = 5000,
   onReturn,
   onTimeout,
 }: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
   amount: number;
   hasTimeout?: boolean;
   timeoutDuration?: number;
@@ -27,39 +22,36 @@ const TransactionSuccessModal = ({
     if (hasTimeout) {
       timeoutRef.current = setTimeout(() => {
         onTimeout?.();
-        setVisible(false);
       }, timeoutDuration);
     }
-  }, [hasTimeout, onTimeout, setVisible, timeoutDuration]);
+  }, [hasTimeout, onTimeout, timeoutDuration]);
 
   return (
-    <MonaModal visible={visible} setVisible={setVisible} hasCloseButton={false}>
-      <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-          <CircularAvatar backgroundColor={MonaColors.success} size={40}>
-            <Image
-              source={require('../../assets/checkmark2.png')}
-              style={styles.image}
-            />
-          </CircularAvatar>
-        </View>
-        <Text style={styles.title}>Payment Successful!</Text>
-        <Text style={styles.subtitle}>
-          Your payment of ₦{amount} was successful! Mona has sent you a
-          transaction receipt!
-        </Text>
-        <MonaButton
-          style={styles.button}
-          text="Return"
-          onPress={() => {
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
-            onReturn?.();
-          }}
-        />
+    <View style={styles.container}>
+      <View style={styles.avatarContainer}>
+        <CircularAvatar backgroundColor={MonaColors.success} size={40}>
+          <Image
+            source={require('../../assets/checkmark2.png')}
+            style={styles.image}
+          />
+        </CircularAvatar>
       </View>
-    </MonaModal>
+      <Text style={styles.title}>Payment Successful!</Text>
+      <Text style={styles.subtitle}>
+        Your payment of ₦{amount} was successful! Mona has sent you a
+        transaction receipt!
+      </Text>
+      <MonaButton
+        style={styles.button}
+        text="Return"
+        onPress={() => {
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          onReturn?.();
+        }}
+      />
+    </View>
   );
 };
 

@@ -1,107 +1,84 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
-import CollectionSubscriptionView from '../components/CollectionSubscriptionView';
 import {
   type CollectionResponse,
-  CollectionType,
-  type ModalType,
-  MonaModal,
+  CollectionType
 } from 'pay-with-mona-react-native';
-import CollectionScheduledView from '../components/CollectionScheduledView';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import CircularAvatar from '../components/CircularAvatar';
+import CollectionScheduledView from '../components/CollectionScheduledView';
+import CollectionSubscriptionView from '../components/CollectionSubscriptionView';
+import BankIcon from '../components/icons/Bank';
+import DirectionsIcon from '../components/icons/Directions';
 import MonaButton from '../components/MonaButton';
 import SizedBox from '../components/SizedBox';
-import { MonaColors } from '../utils/theme';
-import {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  type ForwardedRef,
-} from 'react';
-import BankIcon from '../components/icons/Bank';
 import { getMonaSdkState } from '../utils/helpers';
-import DirectionsIcon from '../components/icons/Directions';
+import { MonaColors } from '../utils/theme';
 
-const CollectionConfirmationDialog = forwardRef(
-  (
-    {
-      loading,
-      collection,
-      onSubmit,
-    }: {
-      loading: boolean;
-      collection: CollectionResponse;
-      onSubmit?: () => void;
-    },
-    ref: ForwardedRef<ModalType>
-  ) => {
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const open = () => {
-      setShowModal(true);
-    };
-    const close = () => {
-      setShowModal(false);
-    };
-    useImperativeHandle(ref, () => ({
-      open,
-      close,
-    }));
-    const sdkState = getMonaSdkState();
-    const merchant = sdkState.merchantSdk;
-    return (
-      <MonaModal visible={showModal} setVisible={setShowModal}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <CircularAvatar size={48} backgroundColor={'#3045FB1A'}>
-              <BankIcon />
-            </CircularAvatar>
-            <DirectionsIcon height={22} width={22} />
-            <Image source={require('../assets/logo.png')} style={styles.logo} />
-          </View>
-          <Text style={styles.title}>NGdeals wants to automate repayments</Text>
-          <Text style={styles.subtitle}>Please verify the details below</Text>
-
-          {collection.schedule &&
-            collection.schedule.type === CollectionType.SCHEDULED && (
-              <CollectionScheduledView
-                merchantName={merchant?.name ?? 'N/A'}
-                duration={
-                  collection.expiryDate instanceof Date
-                    ? collection.expiryDate.toLocaleDateString('en-Us')
-                    : new Date(collection.expiryDate).toLocaleDateString(
-                        'en-Us'
-                      )
-                }
-                debitLimit={collection.maxAmount}
-                monthlyLimit={collection.monthlyLimit}
-                reference={collection.reference}
-              />
-            )}
-          {collection.schedule &&
-            collection.schedule.type === CollectionType.SUBSCRIPTION && (
-              <CollectionSubscriptionView
-                merchantName={merchant?.name ?? 'N/A'}
-                frequency={collection.schedule?.frequency ?? ''}
-                startDate={
-                  collection.startDate instanceof Date
-                    ? collection.startDate.toLocaleDateString('en-Us')
-                    : new Date(collection.startDate).toLocaleDateString('en-Us')
-                }
-                amount={collection.schedule.amount ?? '0'}
-                reference={collection.reference}
-              />
-            )}
-          <SizedBox height={10} />
-          <MonaButton
-            style={styles.button}
-            text="Continue to Mona"
-            isLoading={loading}
-            onPress={() => onSubmit?.()}
-          />
-        </View>
-      </MonaModal>
-    );
+const CollectionConfirmationDialog = (
+  {
+    loading,
+    collection,
+    onSubmit,
+  }: {
+    loading: boolean;
+    collection: CollectionResponse;
+    onSubmit?: () => void;
   }
-);
+) => {
+  const sdkState = getMonaSdkState();
+  const merchant = sdkState.merchantSdk;
+  return (
+
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <CircularAvatar size={48} backgroundColor={'#3045FB1A'}>
+          <BankIcon />
+        </CircularAvatar>
+        <DirectionsIcon height={22} width={22} />
+        <Image source={require('../assets/logo.png')} style={styles.logo} />
+      </View>
+      <Text style={styles.title}>NGdeals wants to automate repayments</Text>
+      <Text style={styles.subtitle}>Please verify the details below</Text>
+
+      {collection.schedule &&
+        collection.schedule.type === CollectionType.SCHEDULED && (
+          <CollectionScheduledView
+            merchantName={merchant?.name ?? 'N/A'}
+            duration={
+              collection.expiryDate instanceof Date
+                ? collection.expiryDate.toLocaleDateString('en-Us')
+                : new Date(collection.expiryDate).toLocaleDateString(
+                  'en-Us'
+                )
+            }
+            debitLimit={collection.maxAmount}
+            monthlyLimit={collection.monthlyLimit}
+            reference={collection.reference}
+          />
+        )}
+      {collection.schedule &&
+        collection.schedule.type === CollectionType.SUBSCRIPTION && (
+          <CollectionSubscriptionView
+            merchantName={merchant?.name ?? 'N/A'}
+            frequency={collection.schedule?.frequency ?? ''}
+            startDate={
+              collection.startDate instanceof Date
+                ? collection.startDate.toLocaleDateString('en-Us')
+                : new Date(collection.startDate).toLocaleDateString('en-Us')
+            }
+            amount={collection.schedule.amount ?? '0'}
+            reference={collection.reference}
+          />
+        )}
+      <SizedBox height={10} />
+      <MonaButton
+        style={styles.button}
+        text="Continue to Mona"
+        isLoading={loading}
+        onPress={() => onSubmit?.()}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

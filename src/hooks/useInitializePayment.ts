@@ -2,14 +2,14 @@ import { useCallback, useState } from 'react';
 import { FirebaseSSE, type SSEEvent } from '../services/FirebaseSSEStream';
 interface InitializePaymentProps {
   transactionId: string;
-  // onPaymentUpdate: (event: SSEEvent) => void;
+  onPaymentUpdate: (event: SSEEvent) => void;
   onTransactionUpdate: (event: SSEEvent) => void;
   onError?: (error: Error) => void;
 }
 
 export const useInitializePayment = ({
   transactionId,
-  // onPaymentUpdate,
+  onPaymentUpdate,
   onTransactionUpdate,
   onError,
 }: InitializePaymentProps) => {
@@ -20,17 +20,17 @@ export const useInitializePayment = ({
     if (!transactionId) return;
     setLoading(true);
     try {
-      //
-      // await FirebaseSSE.listenToPaymentEvents(transactionId, {
-      //   onData: (event) => {
-      //     onPaymentUpdate(event);
-      //   },
-      //   onError: (error) => {
-      //     console.error('🔥 SSE Error:', error);
-      //     onError?.(error as Error);
-      //     setValidationError('An error occur, Try again');
-      //   },
-      // });
+
+      await FirebaseSSE.listenToPaymentEvents(transactionId, {
+        onData: (event) => {
+          onPaymentUpdate(event);
+        },
+        onError: (error) => {
+          console.error('🔥 SSE Error:', error);
+          onError?.(error as Error);
+          setValidationError('An error occur, Try again');
+        },
+      });
       await FirebaseSSE.listenToTransactionEvents(transactionId, {
         onData: (event) => {
           onTransactionUpdate(event);
