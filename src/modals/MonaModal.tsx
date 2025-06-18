@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { MonaColors } from '../utils/theme';
+import { lighten, MonaColors } from '../utils/theme';
 
 const MonaModal = ({
   children,
@@ -35,17 +35,17 @@ const MonaModal = ({
     <Modal
       isVisible={visible}
       // onBackdropPress={() => setVisible(false)}
-      onBackdropPress={() => {}}
+      onBackdropPress={() => { }}
       avoidKeyboard={true}
       useNativeDriverForBackdrop={true}
       useNativeDriver={true}
       style={{ justifyContent: 'flex-end', margin: 0 }}
       deviceWidth={Dimensions.get('window').width}
       propagateSwipe
-      // visible={visible}
-      // transparent
-      // animationType="slide"
-      // onRequestClose={handleClose}
+    // visible={visible}
+    // transparent
+    // animationType="slide"
+    // onRequestClose={handleClose}
     >
       {/* Backdrop */}
       {/* <Pressable style={styles.backdrop} onPress={() => {}} /> */}
@@ -68,7 +68,7 @@ const MonaModal = ({
               />
               {hasCloseButton && (
                 <TouchableWithoutFeedback onPress={handleClose}>
-                  <View style={styles.closeIconContainer}>
+                  <View style={[styles.closeIconContainer, { backgroundColor: lighten(MonaColors.primary, 35) }]}>
                     <Image
                       source={require('../assets/dialog_close_icon.png')}
                       style={styles.closeIcon}
@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
   closeIconContainer: {
     height: 20,
     width: 20,
-    backgroundColor: '#8E94F1',
     borderRadius: 24 / 2,
     position: 'absolute',
     right: 10,

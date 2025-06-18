@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import MonaModal from './MonaModal';
 import MonaButton from '../components/MonaButton';
 import { MonaColors } from '../utils/theme';
 import type { BankOptions } from '../types';
 import BankOptionsTile from '../components/BankOptionsTile';
 import SizedBox from '../components/SizedBox';
+import ArrowRight from '../components/icons/ArrowRight';
 
 const TransactionConfirmationModal = ({
   visible,
@@ -43,10 +44,7 @@ const TransactionConfirmationModal = ({
             <Text style={[styles.changeText, { color: MonaColors.primary }]}>
               Change
             </Text>
-            <Image
-              source={require('../assets/arrow_right.png')}
-              style={styles.arrowRightIcon}
-            />
+            <ArrowRight width={12} height={12} color={MonaColors.primary} />
           </View>
         }
       />
