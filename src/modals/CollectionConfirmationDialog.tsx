@@ -2,12 +2,13 @@ import {
   type CollectionResponse,
   CollectionType
 } from 'pay-with-mona-react-native';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import CircularAvatar from '../components/CircularAvatar';
 import CollectionScheduledView from '../components/CollectionScheduledView';
 import CollectionSubscriptionView from '../components/CollectionSubscriptionView';
 import BankIcon from '../components/icons/Bank';
 import DirectionsIcon from '../components/icons/Directions';
+import MerchantLogo from '../components/MerchantLogo';
 import MonaButton from '../components/MonaButton';
 import SizedBox from '../components/SizedBox';
 import { useMonaSdkStore } from '../hooks/useMonaSdkStore';
@@ -34,9 +35,9 @@ const CollectionConfirmationDialog = (
           <BankIcon />
         </CircularAvatar>
         <DirectionsIcon height={22} width={22} />
-        <Image source={require('../assets/logo.png')} style={styles.logo} />
+        <MerchantLogo />
       </View>
-      <Text style={styles.title}>NGdeals wants to automate repayments</Text>
+      <Text style={styles.title}>{merchant?.name || 'N/A'} wants to automate repayments</Text>
       <Text style={styles.subtitle}>Please verify the details below</Text>
 
       {collection.schedule &&

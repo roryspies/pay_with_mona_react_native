@@ -1,10 +1,9 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import CircularAvatar from '../components/CircularAvatar';
+import SvgSecuritySafe from '../components/icons/SecuritySafe';
+import MerchantLogo from '../components/MerchantLogo';
 import MonaButton from '../components/MonaButton';
 import { lighten, MonaColors } from '../utils/theme';
-import SvgSecuritySafe from '../components/icons/SecuritySafe';
-import { useMonaSdkStore } from '../hooks/useMonaSdkStore';
-import { useState } from 'react';
 
 const KeyExchangeConfirmationModal = (
   {
@@ -13,9 +12,6 @@ const KeyExchangeConfirmationModal = (
     onSubmit?: () => void;
   },
 ) => {
-  const logo = useMonaSdkStore((state) => state.merchantSdk?.image);
-  const name = useMonaSdkStore((state) => state.merchantSdk?.name);
-  const [logoError, setLogoError] = useState(!logo);
 
   return (
     <View style={styles.container}>
@@ -33,22 +29,7 @@ const KeyExchangeConfirmationModal = (
             height: 16,
           }}
         />
-        {
-          logo && !logoError ? (
-            <Image
-              source={{ uri: logo }}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 50,
-                resizeMode: 'cover',
-              }}
-              onError={() => setLogoError(true)}
-            />
-          ) : (
-            <Text style={{ color: MonaColors.primary }}>{name}</Text>
-          )
-        }
+        <MerchantLogo />
       </View>
       <Text style={styles.title}>One Last Thing!</Text>
       <Text style={styles.subtitle}>
