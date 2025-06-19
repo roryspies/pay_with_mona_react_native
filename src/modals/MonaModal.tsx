@@ -11,6 +11,18 @@ import {
 import Modal from 'react-native-modal';
 import { lighten, MonaColors } from '../utils/theme';
 
+const { height: screenHeight } = Dimensions.get('window');
+const INITIAL_HEIGHT = screenHeight * 0.5;
+
+interface MonaModalProps {
+  children: ReactNode;
+  visible: boolean;
+  backgroundColor?: string;
+  usePoweredByMona?: boolean;
+  hasCloseButton?: boolean;
+  onClose?: () => void;
+}
+
 const MonaModal = ({
   children,
   visible,
@@ -18,99 +30,187 @@ const MonaModal = ({
   usePoweredByMona = false,
   hasCloseButton = true,
   onClose,
-}: {
-  children: ReactNode;
-  visible: boolean;
-  backgroundColor?: string;
-  usePoweredByMona?: boolean;
-  hasCloseButton?: boolean;
-  onClose?: () => void;
-}) => {
-  const [contentHeight, setContentHeight] = useState(0);
-  const animatedHeight = useRef(new Animated.Value(0)).current;
-  const measureRef = useRef<View>(null);
-  const hasInitiallyMeasured = useRef(false);
-  const previousChildren = useRef<ReactNode>(children);
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+}: MonaModalProps) => {
+  const [internalVisible, setInternalVisible] = useState(false);
+  const [measuredHeight, setMeasuredHeight] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [contentKey, setContentKey] = useState(0); // Force re-render when content changes
+  const [hasAnimatedToMeasured, setHasAnimatedToMeasured] = useState(false);
 
-  // Measure the content
+  const animatedHeight = useRef(new Animated.Value(0)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const measureRef = useRef<View>(null);
+  const measureTimer = useRef<NodeJS.Timeout | null>(null);
+  const previousChildren = useRef<ReactNode>(children);
+  const lastMeasuredHeight = useRef<number | null>(null);
+
   const measureContent = () => {
-    if (measureRef.current && visible) {
-      measureRef.current.measure((_, __, ___, height) => {
-        if (height && height > 0) {
-          setContentHeight(height);
-          hasInitiallyMeasured.current = true;
-        }
+    if (measureRef.current && internalVisible) {
+      // Use requestAnimationFrame to ensure layout is complete
+      requestAnimationFrame(() => {
+        measureRef.current?.measure((_, __, ___, height) => {
+          if (height && height > 0) {
+            // Only update if height changed significantly (avoid micro-changes)
+            const heightDifference = lastMeasuredHeight.current ? Math.abs(height - lastMeasuredHeight.current) : Infinity;
+
+            if (heightDifference > 5) { // 5px threshold to avoid tiny changes
+              console.log('Measured height:', height, 'Previous:', lastMeasuredHeight.current);
+              lastMeasuredHeight.current = height;
+              setMeasuredHeight(height);
+            }
+          }
+        });
       });
     }
   };
 
-  // Reset and measure when modal becomes visible
-  useEffect(() => {
-    if (visible) {
-      // Only reset height if this is the first appearance
-      if (!hasInitiallyMeasured.current) {
-        animatedHeight.setValue(0);
-      }
+  const openModal = () => {
+    setInternalVisible(true);
+    setIsAnimating(true);
+    setMeasuredHeight(null);
+    setHasAnimatedToMeasured(false);
+    lastMeasuredHeight.current = null;
 
-      // Use a small delay to ensure modal is fully mounted
-      const timer = setTimeout(measureContent, 50);
-      return () => clearTimeout(timer);
-    } else {
-      // When closing, immediately reset the animation
-      animatedHeight.setValue(0);
+    // Animate backdrop and content together
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.spring(animatedHeight, {
+        toValue: INITIAL_HEIGHT,
+        useNativeDriver: false,
+        speed: 12,
+        bounciness: 2,
+      })
+    ]).start(() => {
+      setIsAnimating(false);
+      // Measure after initial animation completes
+      measureTimer.current = setTimeout(measureContent, 50);
+    });
+  };
 
-      return () => { }
+  const closeModal = () => {
+    if (isAnimating) return;
+
+    setIsAnimating(true);
+
+    if (measureTimer.current) {
+      clearTimeout(measureTimer.current);
     }
-  }, [visible, animatedHeight]);
 
-  // Re-measure when children change
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(animatedHeight, {
+        toValue: 0,
+        useNativeDriver: false,
+        speed: 15,
+        bounciness: 0,
+      })
+    ]).start(() => {
+      setInternalVisible(false);
+      setIsAnimating(false);
+      setMeasuredHeight(null);
+      setHasAnimatedToMeasured(false);
+      lastMeasuredHeight.current = null;
+      onClose?.();
+    });
+  };
+
+  // Handle external visibility changes
   useEffect(() => {
-    // Skip initial render and only run when modal is visible
-    if (previousChildren.current !== children && visible) {
-      previousChildren.current = children;
-
-      // Debounce measurements to avoid rapid changes
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-
-      debounceTimer.current = setTimeout(measureContent, 50);
+    if (visible && !internalVisible && !isAnimating) {
+      openModal();
+    } else if (!visible && internalVisible && !isAnimating) {
+      closeModal();
     }
 
     return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
+      if (measureTimer.current) {
+        clearTimeout(measureTimer.current);
       }
     };
-  }, [children, visible]);
+  }, [visible, internalVisible, isAnimating]);
 
-  // Animate to the measured height
+  // Re-measure when children change
   useEffect(() => {
-    if (contentHeight > 0 && visible) {
-      Animated.spring(animatedHeight, {
-        toValue: contentHeight,
-        useNativeDriver: false,
-        speed: 10,
-        bounciness: 1,
-      }).start();
+    if (previousChildren.current !== children && internalVisible) {
+      previousChildren.current = children;
+      setContentKey(prev => prev + 1); // Force re-render
+      setMeasuredHeight(null);
+      setHasAnimatedToMeasured(false);
+      lastMeasuredHeight.current = null;
+
+      // Debounce measurements
+      if (measureTimer.current) {
+        clearTimeout(measureTimer.current);
+      }
+      measureTimer.current = setTimeout(measureContent, 100);
     }
-  }, [contentHeight, animatedHeight, visible]);
+  }, [children, internalVisible]);
+
+  // Adjust to measured height (only once per measurement)
+  useEffect(() => {
+    if (measuredHeight && internalVisible && !isAnimating && !hasAnimatedToMeasured) {
+      const heightDifference = Math.abs(measuredHeight - INITIAL_HEIGHT);
+
+      console.log('Animating to height:', measuredHeight, 'Current initial:', INITIAL_HEIGHT);
+      setHasAnimatedToMeasured(true);
+
+      if (heightDifference > 30) {
+        Animated.spring(animatedHeight, {
+          toValue: measuredHeight,
+          useNativeDriver: false,
+          speed: 15,
+          bounciness: 3,
+        }).start();
+      } else {
+        animatedHeight.setValue(measuredHeight);
+      }
+    }
+  }, [measuredHeight, internalVisible, isAnimating, hasAnimatedToMeasured]);
+
+  // Don't render anything if not visible
+  if (!internalVisible) {
+    return null;
+  }
 
   return (
     <Modal
-      isVisible={visible}
-      onBackdropPress={onClose}
+      isVisible={true}
+      onBackdropPress={closeModal}
       avoidKeyboard={true}
-      useNativeDriverForBackdrop={true}
-      useNativeDriver={true}
+      useNativeDriverForBackdrop={false}
+      useNativeDriver={false}
       style={{ justifyContent: 'flex-end', margin: 0 }}
       deviceWidth={Dimensions.get('window').width}
-      animationInTiming={300}
-      animationOutTiming={300}
-      hideModalContentWhileAnimating={true}
+      animationInTiming={0}
+      animationOutTiming={0}
+      backdropOpacity={0}
+      hideModalContentWhileAnimating={false}
       propagateSwipe
     >
+      {/* Custom animated backdrop */}
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            opacity: backdropOpacity,
+          }
+        ]}
+      >
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={StyleSheet.absoluteFillObject} />
+        </TouchableWithoutFeedback>
+      </Animated.View>
+
+      {/* Modal content */}
       <View
         style={[
           styles.bottomSheet,
@@ -119,61 +219,41 @@ const MonaModal = ({
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            {/* This hidden view is used only for measurement */}
+            {/* Hidden measurement view - ESSENTIAL for accurate height calculation */}
             <View
+              key={`measure-${contentKey}`} // Force re-render when content changes
               ref={measureRef}
-              style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+              style={{
+                position: 'absolute',
+                opacity: 0,
+                pointerEvents: 'none',
+                width: '100%' // Ensure same width as visible content
+              }}
+              onLayout={measureContent} // Alternative measurement trigger
             >
-              <View style={styles.topBar}>
-                <Image source={require('../assets/city_bg.png')} style={styles.logo} />
-                {hasCloseButton && (
-                  <View style={styles.closeIconContainer}>
-                    <Image source={require('../assets/dialog_close_icon.png')} style={styles.closeIcon} />
-                  </View>
-                )}
-              </View>
-              <View style={styles.bottomSheetContent}>
+              <ModalContent
+                hasCloseButton={hasCloseButton}
+                onClose={closeModal}
+                usePoweredByMona={usePoweredByMona}
+              >
                 {children}
-                <Image
-                  source={
-                    usePoweredByMona
-                      ? require('../assets/poweredbymona.png')
-                      : require('../assets/securebymona.png')
-                  }
-                  style={styles.footerImage}
-                />
-              </View>
+              </ModalContent>
             </View>
 
-            {/* This is the visible, animated content */}
-            <Animated.View style={{ height: animatedHeight, overflow: 'hidden' }}>
-              <View style={[styles.topBar, { backgroundColor: MonaColors.primary }]}>
-                <Image
-                  source={require('../assets/city_bg.png')}
-                  style={styles.logo}
-                />
-                {hasCloseButton && (
-                  <TouchableWithoutFeedback onPress={onClose}>
-                    <View style={[styles.closeIconContainer, { backgroundColor: lighten(MonaColors.primary, 35) }]}>
-                      <Image
-                        source={require('../assets/dialog_close_icon.png')}
-                        style={styles.closeIcon}
-                      />
-                    </View>
-                  </TouchableWithoutFeedback>
-                )}
-              </View>
-              <View style={styles.bottomSheetContent}>
+            {/* Visible animated content */}
+            <Animated.View
+              style={{
+                height: animatedHeight,
+                overflow: 'hidden',
+              }}
+            >
+              <ModalContent
+                hasCloseButton={hasCloseButton}
+                onClose={closeModal}
+                usePoweredByMona={usePoweredByMona}
+              >
                 {children}
-                <Image
-                  source={
-                    usePoweredByMona
-                      ? require('../assets/poweredbymona.png')
-                      : require('../assets/securebymona.png')
-                  }
-                  style={styles.footerImage}
-                />
-              </View>
+              </ModalContent>
             </Animated.View>
           </View>
         </TouchableWithoutFeedback>
@@ -182,21 +262,55 @@ const MonaModal = ({
   );
 };
 
+const ModalContent = ({
+  children,
+  hasCloseButton,
+  onClose,
+  usePoweredByMona,
+}: Partial<MonaModalProps>) => {
+  return (
+    <>
+      <View style={[styles.topBar, { backgroundColor: MonaColors.primary }]}>
+        <Image
+          source={require('../assets/city_bg.png')}
+          style={styles.logo}
+        />
+        {hasCloseButton && (
+          <TouchableWithoutFeedback onPress={onClose}>
+            <View style={[styles.closeIconContainer, { backgroundColor: lighten(MonaColors.primary, 35) }]}>
+              <Image
+                source={require('../assets/dialog_close_icon.png')}
+                style={styles.closeIcon}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+      </View>
+      <View style={styles.bottomSheetContent}>
+        {children}
+        <Image
+          source={
+            usePoweredByMona
+              ? require('../assets/poweredbymona.png')
+              : require('../assets/securebymona.png')
+          }
+          style={styles.footerImage}
+        />
+      </View>
+    </>
+  );
+};
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
   bottomSheet: {
-    // position: 'absolute',
-    // bottom: 0,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     elevation: 10,
     overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   bottomSheetContent: {
     margin: 20,
@@ -222,10 +336,10 @@ const styles = StyleSheet.create({
   closeIconContainer: {
     height: 20,
     width: 20,
-    borderRadius: 24 / 2,
+    borderRadius: 12,
     position: 'absolute',
     right: 10,
-    top: (36 / 2) * 0.5,
+    top: 8,
   },
   footerImage: {
     width: '100%',
