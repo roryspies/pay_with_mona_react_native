@@ -3,6 +3,8 @@ import CircularAvatar from '../components/CircularAvatar';
 import MonaButton from '../components/MonaButton';
 import { lighten, MonaColors } from '../utils/theme';
 import SvgSecuritySafe from '../components/icons/SecuritySafe';
+import { useMonaSdkStore } from '../hooks/useMonaSdkStore';
+import { useState } from 'react';
 
 const KeyExchangeConfirmationModal = (
   {
@@ -13,6 +15,10 @@ const KeyExchangeConfirmationModal = (
     onSubmit?: () => void;
   },
 ) => {
+  const logo = useMonaSdkStore((state) => state.merchantSdk?.image);
+  const name = useMonaSdkStore((state) => state.merchantSdk?.name);
+  const [logoError, setLogoError] = useState(!logo);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -29,15 +35,22 @@ const KeyExchangeConfirmationModal = (
             height: 16,
           }}
         />
-        <Image
-          source={require('../assets/ng_deals_logo.png')}
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 50,
-            resizeMode: 'cover',
-          }}
-        />
+        {
+          logo && !logoError ? (
+            <Image
+              source={{ uri: logo }}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 50,
+                resizeMode: 'cover',
+              }}
+              onError={() => setLogoError(true)}
+            />
+          ) : (
+            <Text style={{ color: MonaColors.primary }}>{name}</Text>
+          )
+        }
       </View>
       <Text style={styles.title}>One Last Thing!</Text>
       <Text style={styles.subtitle}>
