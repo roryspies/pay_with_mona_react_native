@@ -1,24 +1,17 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
-import MonaModal from '../MonaModal';
-import MonaButton from '../../components/MonaButton';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import CircularAvatar from '../../components/CircularAvatar';
+import MonaButton from '../../components/MonaButton';
 import { MonaColors } from '../../utils/theme';
 
 const TransactionFailedModal = ({
-  visible,
-  setVisible,
   amount,
   onRetry,
-  loading,
   hasTimeout = false,
   timeoutDuration = 10000,
   onTimeout,
 }: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
   amount: number;
-  loading?: boolean;
   hasTimeout?: boolean;
   timeoutDuration?: number;
   onRetry?: () => void;
@@ -29,39 +22,35 @@ const TransactionFailedModal = ({
     if (hasTimeout) {
       timeoutRef.current = setTimeout(() => {
         onTimeout?.();
-        setVisible(false);
       }, timeoutDuration);
     }
-  }, [hasTimeout, onTimeout, setVisible, timeoutDuration]);
+  }, [hasTimeout, onTimeout, timeoutDuration]);
   return (
-    <MonaModal visible={visible} setVisible={setVisible} hasCloseButton={false}>
-      <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-          <CircularAvatar backgroundColor={MonaColors.error} size={40}>
-            <Image
-              source={require('../../assets/failed.png')}
-              style={styles.image}
-            />
-          </CircularAvatar>
-        </View>
-        <Text style={styles.title}>Payment Failed!</Text>
-        <Text style={styles.subtitle}>
-          Your payment of ₦{amount} failed! Please try again or use a different
-          payment method.
-        </Text>
-        <MonaButton
-          style={styles.button}
-          text="Try Again"
-          isLoading={loading}
-          onPress={() => {
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
-            onRetry?.();
-          }}
-        />
+    <View style={styles.container}>
+      <View style={styles.avatarContainer}>
+        <CircularAvatar backgroundColor={MonaColors.error} size={40}>
+          <Image
+            source={require('../../assets/failed.png')}
+            style={styles.image}
+          />
+        </CircularAvatar>
       </View>
-    </MonaModal>
+      <Text style={styles.title}>Payment Failed!</Text>
+      <Text style={styles.subtitle}>
+        Your payment of ₦{amount} failed! Please try again or use a different
+        payment method.
+      </Text>
+      <MonaButton
+        style={styles.button}
+        text="Try Again"
+        onPress={() => {
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          onRetry?.();
+        }}
+      />
+    </View>
   );
 };
 

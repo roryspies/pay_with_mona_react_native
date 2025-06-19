@@ -6,29 +6,33 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useValidatePII } from '../hooks/useValidatePII';
+import CollectionAccountSelectionDialog from '../modals/CollectionAccoutSelectionDialog';
+import CollectionConfirmationDialog from '../modals/CollectionConfirmationDialog';
+import CollectionSuccessDialog from '../modals/CollectionSuccessDialog';
+import KeyExchangeConfirmationModal from '../modals/KeyExchangeConfirmationModal';
+import MonaModal from '../modals/MonaModal';
+import ProgressModal from '../modals/ProgressModal';
 import { collectionService } from '../services/CollectionService';
 import { monaService } from '../services/MonaService';
-import KeyExchangeConfirmationModal from '../modals/KeyExchangeConfirmationModal';
-import CollectionAccountSelectionDialog from '../modals/CollectionAccoutSelectionDialog';
 import {
   type BankOptions,
   type CollectionResponse,
-  type ModalType,
   type PayWithMonaCollectionsContextType,
 } from '../types';
 import { handleSetState } from '../utils/helpers';
-import { useValidatePII } from '../hooks/useValidatePII';
-import CollectionConfirmationDialog from '../modals/CollectionConfirmationDialog';
-import CollectionSuccessDialog from '../modals/CollectionSuccessDialog';
 
 const PayMonaCollectionsContext =
   createContext<PayWithMonaCollectionsContextType | null>(null);
 
-type LoadingState = {
-  main: boolean;
-  collectionConsent: boolean;
-  keyExchange: boolean;
-};
+// Make sure to define the ModalState enum as a string enum, if not the !!modalState check will fail for 0 values
+enum ModalState {
+  collectionConfirmation = 'collectionConfirmation',
+  collectionAccountSelection = 'collectionAccountSelection',
+  keyExchangeConfirmation = 'keyExchangeConfirmation',
+  collectionSuccess = 'collectionSuccess',
+  loading = 'loading',
+}
 
 // type Collection = CollectionResponse & {
 //   merchantName: string;
@@ -52,21 +56,32 @@ export const PayWithMonaCollectionsProvider = ({
   const [requestId, setRequestId] = useState<string>('');
   const onSuccessRef = useRef<(() => void) | null>(null);
   const onErrorRef = useRef<((error: Error) => void) | null>(null);
-  const keyExchangeModalRef = useRef<ModalType>(null);
-  const collectionAccountModalRef = useRef<ModalType>(null);
-  const collectionConfirmationRef = useRef<ModalType>(null);
-  const collectionSuccessRef = useRef<ModalType>(null);
-  const [loadingState, setLoadingState] = useState<LoadingState>({
-    main: false,
-    collectionConsent: false,
-    keyExchange: false,
-  });
+  const [modalState, setModalState] = useState<ModalState>();
+  const [_, setMainLoading] = useState<boolean>(false);
   const [collectionState, setCollectionState] = useState<CollectionState>({
     deviceAuth: null,
     sessionId: null,
     bank: null,
     collectionResponse: null,
   });
+
+  const startLoading = useCallback(
+    () => setModalState(ModalState.loading),
+    []
+  );
+  const startMainLoading = useCallback(
+    () => setMainLoading(true),
+    []
+  );
+  const stopLoading = useCallback(
+    () => setModalState((prev) => (prev === ModalState.loading ? undefined : prev)),
+    []
+  );
+  const stopMainLoading = useCallback(
+    () => setMainLoading(false),
+    []
+  );
+
   const {
     loading: validatePIILoading,
     validate: validatePII,
@@ -85,24 +100,26 @@ export const PayWithMonaCollectionsProvider = ({
       setRequestId(propsRequestId);
       handleSetState(setCollectionState, { collectionResponse: collection });
       validatePII();
-      setTimeout(() => collectionConfirmationRef.current?.open(), 200);
+      setTimeout(() => {
+        setModalState(ModalState.collectionConfirmation);
+      }, 200);
     },
     [validatePII]
   );
   const hideModal = useCallback(
-    () => collectionAccountModalRef?.current?.close(),
+    () => setModalState(undefined),
     []
   );
 
   const handleAuthEventUpdate = useCallback(
     async (strongAuthToken: string, mainSessionId: string) => {
-      handleSetState(setLoadingState, { main: true });
+      startMainLoading();
       try {
         const response = await monaService.loginWithStrongAuth(
           strongAuthToken,
           null
         );
-        keyExchangeModalRef.current?.open();
+        setModalState(ModalState.keyExchangeConfirmation);
         handleSetState(setCollectionState, {
           sessionId: mainSessionId,
           deviceAuth: response.deviceAuth,
@@ -111,7 +128,7 @@ export const PayWithMonaCollectionsProvider = ({
         console.log('🔥 SSE Error:', error);
         onErrorRef.current?.(error as Error);
       } finally {
-        handleSetState(setLoadingState, { main: false });
+        stopMainLoading();
       }
     },
     []
@@ -119,19 +136,18 @@ export const PayWithMonaCollectionsProvider = ({
 
   const signAndCommitKeys = useCallback(async () => {
     try {
-      handleSetState(setLoadingState, { keyExchange: true });
+      startLoading();
       await monaService.signAndCommitKeys({
         deviceAuth: collectionState.deviceAuth,
         message: 'Authorize Collection',
       });
       await validatePII();
-      keyExchangeModalRef.current?.close();
-      collectionAccountModalRef?.current?.open();
+      setModalState(ModalState.collectionAccountSelection);
     } catch (error) {
       console.log('🔥 SSE Error:', error);
       onErrorRef.current?.(error as Error);
     } finally {
-      handleSetState(setLoadingState, { keyExchange: false });
+      stopLoading();
     }
   }, [collectionState.deviceAuth, validatePII]);
 
@@ -144,20 +160,19 @@ export const PayWithMonaCollectionsProvider = ({
 
         handleSetState(setCollectionState, { bank: bank });
       }
-      handleSetState(setLoadingState, { collectionConsent: true });
+      startLoading();
 
       try {
         await collectionService.createCollectionConsentRequest({
           bankId: value.bankId,
           accessRequestId: requestId,
         });
-        collectionSuccessRef.current?.open();
+        setModalState(ModalState.collectionSuccess);
       } catch (e) {
         console.log('Create collection error', e);
         onErrorRef.current?.(e as Error);
       } finally {
-        handleSetState(setLoadingState, { collectionConsent: false });
-        collectionAccountModalRef?.current?.close();
+        stopLoading();
       }
     },
     [requestId, validationData]
@@ -178,44 +193,55 @@ export const PayWithMonaCollectionsProvider = ({
     >
       {children}
 
-      {collectionState.collectionResponse && (
-        <CollectionConfirmationDialog
-          ref={collectionConfirmationRef}
-          loading={false}
-          collection={collectionState.collectionResponse}
-          onSubmit={() => {
-            collectionConfirmationRef.current?.close();
-            collectionAccountModalRef?.current?.open();
-          }}
-        />
-      )}
+      <MonaModal
+        visible={!!modalState}
+        onClose={() => setModalState(undefined)}
+      >
+        {collectionState.collectionResponse && modalState === ModalState.collectionConfirmation && (
+          <CollectionConfirmationDialog
+            loading={false}
+            collection={collectionState.collectionResponse}
+            onSubmit={() => setModalState(ModalState.collectionAccountSelection)}
+          />
+        )}
 
-      <CollectionAccountSelectionDialog
-        ref={collectionAccountModalRef}
-        loading={loadingState.collectionConsent || validatePIILoading}
-        savedPaymentOptions={validationData}
-        accessRequestId={requestId}
-        onSubmit={createCollectionConsentRequest}
-      />
+        {
+          modalState === ModalState.collectionAccountSelection && (
+            <CollectionAccountSelectionDialog
+              loading={validatePIILoading}
+              savedPaymentOptions={validationData}
+              accessRequestId={requestId}
+              onSubmit={createCollectionConsentRequest}
+            />
+          )
+        }
 
-      <KeyExchangeConfirmationModal
-        loading={loadingState.keyExchange}
-        ref={keyExchangeModalRef}
-        onSubmit={signAndCommitKeys}
-      />
+        {
+          modalState === ModalState.keyExchangeConfirmation && (
+            <KeyExchangeConfirmationModal
+              onSubmit={signAndCommitKeys}
+            />
+          )
+        }
 
-      {collectionState.collectionResponse && collectionState?.bank && (
-        <CollectionSuccessDialog
-          ref={collectionSuccessRef}
-          loading={false}
-          bank={collectionState?.bank}
-          collection={collectionState.collectionResponse}
-          onSubmit={() => {
-            collectionSuccessRef.current?.close();
-            onSuccessRef.current?.();
-          }}
-        />
-      )}
+        {
+          collectionState.collectionResponse && collectionState?.bank && modalState === ModalState.collectionSuccess && (
+            <CollectionSuccessDialog
+              loading={false}
+              bank={collectionState?.bank}
+              collection={collectionState.collectionResponse}
+              onSubmit={() => {
+                setModalState(undefined);
+                onSuccessRef.current?.();
+              }}
+            />
+          )
+        }
+
+        {modalState === ModalState.loading && (
+          <ProgressModal />
+        )}
+      </MonaModal>
     </PayMonaCollectionsContext.Provider>
   );
 };

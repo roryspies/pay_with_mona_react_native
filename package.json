@@ -44,7 +44,8 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
-    "release": "release-it"
+    "release": "release-it",
+    "generate:icons": "npx @svgr/cli --typescript --native --no-dimensions --out-dir src/components/icons -- src/assets"
   },
   "keywords": [
     "react-native",
@@ -73,6 +74,7 @@
     "@react-native/eslint-config": "^0.78.0",
     "@react-native/typescript-config": "^0.79.2",
     "@release-it/conventional-changelog": "^9.0.2",
+    "@svgr/cli": "^8.1.0",
     "@types/crypto-js": "^4.2.2",
     "@types/jest": "^29.5.5",
     "@types/node-forge": "^1.3.11",
@@ -176,8 +178,9 @@
     "crypto-js": "^4.2.0",
     "node-forge": "^1.3.1",
     "react-native-modal": "^14.0.0-rc.1",
+    "react-native-otp-entry": "^1.8.4",
     "react-native-sse": "^1.2.1",
     "react-native-uuid": "^2.0.3",
-    "react-native-otp-entry": "^1.8.4"
+    "zustand": "^5.0.5"
   }
 }

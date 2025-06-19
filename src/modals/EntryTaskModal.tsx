@@ -1,45 +1,37 @@
-import { View, Text, StyleSheet, TextInput, Keyboard } from 'react-native';
-import { MonaColors } from '../utils/theme';
 import {
-  useState,
-  useRef,
-  useEffect,
   forwardRef,
-  type ForwardedRef,
+  useEffect,
   useImperativeHandle,
+  useRef,
+  useState,
+  type ForwardedRef,
 } from 'react';
-import MonaButton from '../components/MonaButton';
-import { TaskType, type ModalType, type PinEntryTask } from '../types';
-import MonaModal from './MonaModal';
+import { Keyboard, StyleSheet, Text, TextInput, View } from 'react-native';
 import { OtpInput } from 'react-native-otp-entry';
+import MonaButton from '../components/MonaButton';
+import { TaskType, type PinEntryTask } from '../types';
+import { MonaColors } from '../utils/theme';
+
+export type EntryTaskModalRef = {
+  clearPin: () => void;
+};
 
 const EntryTaskModal = forwardRef(
   (
     {
       pinEntryTask,
       onSubmit,
+      close = () => { },
     }: {
       pinEntryTask: PinEntryTask;
       onSubmit: (data: string) => void;
+      close?: () => void;
     },
-    ref: ForwardedRef<ModalType>
+    ref: ForwardedRef<EntryTaskModalRef>
   ) => {
     const PIN_LENGTH = pinEntryTask.fieldLength ?? 4;
     const [pin, setPin] = useState('');
     const [_, setFocusedIndex] = useState(0);
-    const [showModal, setShowModal] = useState<boolean>(false);
-
-    const open = () => {
-      setShowModal(true);
-    };
-    const close = () => {
-      setShowModal(false);
-    };
-
-    useImperativeHandle(ref, () => ({
-      open,
-      close,
-    }));
 
     // Create refs for each input
     const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -109,16 +101,12 @@ const EntryTaskModal = forwardRef(
     //   }
     // };
 
-    const handleClose = () => {
-      clearPin();
-    };
+    useImperativeHandle(ref, () => ({
+      clearPin,
+    }));
 
     return (
-      <MonaModal
-        visible={showModal}
-        setVisible={setShowModal}
-        onClose={handleClose}
-      >
+      <>
         <Text style={styles.sheetTitle}>
           {pinEntryTask.taskType === TaskType.PIN
             ? 'Enter Your Transaction PIN'
@@ -192,13 +180,13 @@ const EntryTaskModal = forwardRef(
           text="Submit"
           onPress={() => {
             if (pin.length === PIN_LENGTH) {
-              setShowModal(false);
+              close();
               onSubmit(pin);
             }
           }}
           enabled={pin.length === PIN_LENGTH}
         />
-      </MonaModal>
+      </>
     );
   }
 );

@@ -1,7 +1,3 @@
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
-import Column from './components/Column';
-import SizedBox from './components/SizedBox';
-import MonaButton from './components/MonaButton';
 import React, {
   memo,
   useCallback,
@@ -10,45 +6,38 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import BankOptionsTile from './components/BankOptionsTile';
-import { PaymentMethod, TransactionStatus } from './utils/enums';
+import Column from './components/Column';
+import MonaButton from './components/MonaButton';
+import SizedBox from './components/SizedBox';
+import { useInitializePayment } from './hooks/useInitializePayment';
+import useMakePayment from './hooks/useMakePayment';
+import { useValidatePII } from './hooks/useValidatePII';
+import EntryTaskModal, { type EntryTaskModalRef } from './modals/EntryTaskModal';
+import KeyExchangeConfirmationModal from './modals/KeyExchangeConfirmationModal';
+import MonaModal from './modals/MonaModal';
+import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
+import TransactionFailedModal from './modals/transactions/TransactionFailedModal';
+import TransactionInitiatedModal from './modals/transactions/TransactionInitiatedModal';
+import TransactionSuccessModal from './modals/transactions/TransactionSuccessModal';
+import { monaService } from './services/MonaService';
+import { paymentServices } from './services/PaymentService';
 import {
   TaskType,
   type BankOptions,
-  type ModalType,
   type PayWithMonaProps,
   type PinEntryTask,
-  type SavedPaymentOptions,
+  type SavedPaymentOptions
 } from './types';
-import { useInitializePayment } from './hooks/useInitializePayment';
-import EntryTaskModal from './modals/EntryTaskModal';
-import useMakePayment from './hooks/useMakePayment';
-import TransactionInitiatedModal from './modals/transactions/TransactionInitiatedModal';
-import TransactionSuccessModal from './modals/transactions/TransactionSuccessModal';
-import TransactionFailedModal from './modals/transactions/TransactionFailedModal';
-import TransactionConfirmationModal from './modals/TransactionConfirmationModal';
-import KeyExchangeConfirmationModal from './modals/KeyExchangeConfirmationModal';
+import { PaymentMethod, TransactionStatus } from './utils/enums';
 import {
-  clearMonaSdkState,
   encryptRequestData,
   isAuthenticated,
 } from './utils/helpers';
-import { monaService } from './services/MonaService';
-import { paymentServices } from './services/PaymentService';
-import { useValidatePII } from './hooks/useValidatePII';
 import { MonaColors } from './utils/theme';
-
-interface ModalState {
-  showInitiated: boolean;
-  showSuccess: boolean;
-  showFailure: boolean;
-  showConfirmation: boolean;
-}
-interface LoadingState {
-  main: boolean;
-  setup: boolean;
-  retry: boolean;
-}
+import { useMonaSdkStore } from './hooks/useMonaSdkStore';
+import ProgressModal from './modals/ProgressModal';
 
 interface PaymentState {
   paymentOptions: SavedPaymentOptions | null;
@@ -59,6 +48,17 @@ interface PaymentState {
   sessionId: string | null;
   transactionStatus: TransactionStatus | null;
   entryTask: PinEntryTask | null;
+}
+
+// Make sure to define the ModalState enum as a string enum, if not the !!modalState check will fail for 0 values
+enum ModalState {
+  keyExchange = 'keyExchange',
+  entryTask = 'entryTask',
+  initiated = 'initiated',
+  success = 'success',
+  failure = 'failure',
+  confirmation = 'confirmation',
+  loading = 'loading',
 }
 
 const PayWithMona: React.FC<PayWithMonaProps> = ({
@@ -73,16 +73,11 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     transactionId,
     savedPaymentOptions,
   } = config;
-  const keyExchangeModalRef = useRef<ModalType>(null);
-  const entryTaskModalRef = useRef<ModalType>(null);
+  const entryTaskModalRef = useRef<EntryTaskModalRef>(null);
   const paymentMethodRef = useRef<PaymentMethod>(null);
-  const [paylod, setPayload] = useState({});
-  const [modalState, setModalState] = useState({
-    showInitiated: false,
-    showSuccess: false,
-    showFailure: false,
-    showConfirmation: false,
-  });
+  const [payload, setPayload] = useState({});
+
+  const [modalState, setModalState] = useState<ModalState>();
   const [paymentState, setPaymentState] = useState<PaymentState>({
     paymentOptions: null,
     paymentMethod: null,
@@ -93,20 +88,22 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     transactionStatus: null,
     entryTask: null,
   });
-  const [loadingState, setLoadingState] = useState<LoadingState>({
-    main: false,
-    setup: false,
-    retry: false,
-  });
 
-  const handleSetModalState = useCallback((update: Partial<ModalState>) => {
-    setModalState((prev) => ({ ...prev, ...update }));
-  }, []);
-
-  const handleSetLoadingState = useCallback(
-    (field: keyof LoadingState, value: LoadingState[keyof LoadingState]) => {
-      setLoadingState((prev) => ({ ...prev, [field]: value }));
-    },
+  const [mainLoading, setMainLoading] = useState<boolean>(false);
+  const startLoading = useCallback(
+    () => setModalState(ModalState.loading),
+    []
+  );
+  const startMainLoading = useCallback(
+    () => setMainLoading(true),
+    []
+  );
+  const stopLoading = useCallback(
+    () => setModalState((prev) => (prev === ModalState.loading ? undefined : prev)),
+    []
+  );
+  const stopMainLoading = useCallback(
+    () => setMainLoading(false),
     []
   );
 
@@ -128,14 +125,13 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     () => paymentState.transactionStatus === TransactionStatus.COMPLETED,
     [paymentState.transactionStatus]
   );
-
   const transactionFailed = useMemo(
     () => paymentState.transactionStatus === TransactionStatus.FAILED,
     [paymentState.transactionStatus]
   );
   const isLoading = useMemo(
-    () => Object.values(loadingState).some(Boolean),
-    [loadingState]
+    () => modalState === ModalState.loading || mainLoading,
+    [modalState, mainLoading]
   );
 
   useEffect(() => {
@@ -165,15 +161,26 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
           status === TransactionStatus.PROGRESSUPDATE) &&
         isSavedOption
       ) {
-        handleSetModalState({ showInitiated: true });
+        setModalState(ModalState.initiated);
       }
     },
-    [handleSetModalState, handleSetPaymentState, onTransactionUpdate]
+    [handleSetPaymentState, onTransactionUpdate]
   );
 
   const { initializeEvent } = useInitializePayment({
     transactionId,
     onError: onError,
+    onPaymentUpdate: (event) => {
+      if (!event.data.event) {
+        return;
+      }
+      console.log(
+        'Payment method needed here!!!',
+        paymentState,
+        paymentState.paymentMethod
+      );
+      handleTransactionUpdate(event.data.event, paymentMethodRef.current);
+    },
     onTransactionUpdate: (event) => {
       if (!event.data.event) {
         return;
@@ -195,7 +202,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
   const handleAuthEventUpdate = useCallback(
     async (strongAuthToken: string, mainSessionId: string) => {
-      handleSetLoadingState('main', true);
+      startMainLoading();
       try {
         const response = await monaService.loginWithStrongAuth(
           strongAuthToken,
@@ -205,12 +212,12 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
           deviceAuth: response.deviceAuth,
           sessionId: mainSessionId,
         });
-        keyExchangeModalRef.current?.open();
+        setModalState(ModalState.keyExchange);
       } catch (error) {
         console.log('🔥 SSE Error:', error);
         onError?.(error as Error);
       } finally {
-        handleSetLoadingState('main', false);
+        stopMainLoading();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,51 +226,50 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
   const signAndMakePaymentRequest = useCallback(async () => {
     try {
-      handleSetLoadingState('setup', true);
+      startLoading();
       await monaService.signAndCommitKeys({
         deviceAuth: paymentState.deviceAuth,
         message: 'Authorize set-up',
       });
       await validatePII();
       onAuthUpdate?.();
-      handleSetLoadingState('setup', false);
-      handleSetLoadingState('main', true);
-      keyExchangeModalRef.current?.close();
+      stopLoading();
+      startMainLoading();
+
       if (paymentState.bankId && isSavedOptions) {
-        handleSetModalState({ showConfirmation: true });
+        setModalState(ModalState.confirmation);
+      } else {
+        setModalState(undefined);
       }
-      handleSetLoadingState('main', false);
     } catch (error) {
       console.log('🔥 SSE Error:', error);
       onError?.(error as Error);
     } finally {
-      handleSetLoadingState('setup', false);
-      handleSetLoadingState('main', false);
+      stopLoading();
+      stopMainLoading();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentState.bankId, isSavedOptions, paymentState.deviceAuth]);
 
   const handleRetryPayment = useCallback(async () => {
     try {
-      handleSetLoadingState('retry', true);
+      startLoading();
       handleSetPaymentState({
         paymentMethod: null,
         bankId: null,
         bankOptions: null,
       });
       await initializeEvent();
-      handleSetModalState({ showFailure: false });
-      handleSetLoadingState('retry', false);
+      setModalState(undefined);
     } catch (e) {
-      handleSetLoadingState('retry', false);
       onError?.(e as Error);
+    } finally {
+      stopLoading();
     }
   }, [
     onError,
-    handleSetLoadingState,
     handleSetPaymentState,
     initializeEvent,
-    handleSetModalState,
   ]);
 
   const { loading: paymentLoading, handlePayment } = useMakePayment({
@@ -275,11 +281,15 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     onEntryTaskUpdate: (entryTask: PinEntryTask | null) => {
       console.log('🔑 entryTask:', entryTask);
       handleSetPaymentState({ entryTask: entryTask });
-      setTimeout(() => entryTaskModalRef.current?.open(), 200);
+      setTimeout(() => setModalState(ModalState.entryTask), 200);
     },
     handleAuthEventUpdate: handleAuthEventUpdate,
     handleCloseEventUpdate: () => validatePII(),
   });
+
+  if (paymentLoading && modalState !== ModalState.loading) {
+    setModalState(ModalState.loading);
+  }
 
   useEffect(() => {
     validatePII();
@@ -295,9 +305,9 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       // ✅ Close any open browser tabs
       // ReactNativeCustomTabs.close();
       // ✅ Clear sdk data
-      clearMonaSdkState();
+      useMonaSdkStore.getState().clearMonaSdkState();
       //Other clean ups
-      console.log('MPayWithMonayPage unmounted');
+      console.log('PayWithMonaPage unmounted');
     };
   }, []);
 
@@ -326,7 +336,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         onPress={async () => {
           initializeEvent();
           if (isSavedOptions && isAuthenticated()) {
-            handleSetModalState({ showConfirmation: true });
+            setModalState(ModalState.confirmation);
           } else {
             await handlePayment({
               isOneTap: isSavedOptions,
@@ -340,7 +350,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     isLoading,
     piiLoading,
     handlePayment,
-    handleSetModalState,
     isSavedOptions,
     paymentLoading,
     paymentState.bankOptions,
@@ -394,115 +403,118 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       <SizedBox height={30} />
       {renderButton()}
 
-      {paymentState.entryTask != null && (
-        <EntryTaskModal
-          ref={entryTaskModalRef}
-          pinEntryTask={paymentState.entryTask}
-          onSubmit={async (data) => {
-            let requestPayload;
-            if (
-              paymentState.entryTask?.fieldName != null &&
-              (paymentState.entryTask?.fieldType === TaskType.OTP ||
-                paymentState.entryTask?.fieldType === TaskType.PIN)
-            ) {
-              const isEncrypted = paymentState.entryTask.encrypted;
-              const encryptedData = await encryptRequestData(data);
-              requestPayload = {
-                ...paylod,
-                [paymentState.entryTask.fieldName]: isEncrypted
-                  ? encryptedData
-                  : data,
-              };
-              setPayload(requestPayload);
-            } else {
-              requestPayload = undefined;
-            }
-
-            handlePayment({
-              isOneTap: true,
-              payload: requestPayload,
-            });
-          }}
-        />
-      )}
-
-      <KeyExchangeConfirmationModal
-        loading={loadingState.setup}
-        ref={keyExchangeModalRef}
-        onSubmit={async () => {
-          await signAndMakePaymentRequest();
+      <MonaModal
+        visible={!!modalState}
+        backgroundColor={modalState === ModalState.confirmation ? MonaColors.white : undefined}
+        hasCloseButton={
+          modalState === ModalState.keyExchange ||
+          modalState === ModalState.confirmation
+        }
+        onClose={() => {
+          setModalState(undefined);
+          entryTaskModalRef.current?.clearPin();
         }}
-      />
+      >
+        {modalState === ModalState.entryTask && paymentState.entryTask != null && (
+          <EntryTaskModal
+            ref={entryTaskModalRef}
+            pinEntryTask={paymentState.entryTask}
+            onSubmit={async (data) => {
+              let requestPayload;
+              if (
+                paymentState.entryTask?.fieldName != null &&
+                (paymentState.entryTask?.fieldType === TaskType.OTP ||
+                  paymentState.entryTask?.fieldType === TaskType.PIN)
+              ) {
+                const isEncrypted = paymentState.entryTask.encrypted;
+                const encryptedData = await encryptRequestData(data);
+                requestPayload = {
+                  ...payload,
+                  [paymentState.entryTask.fieldName]: isEncrypted
+                    ? encryptedData
+                    : data,
+                };
+                setPayload(requestPayload);
+              } else {
+                requestPayload = undefined;
+              }
 
-      {paymentState.bankOptions && (
-        <TransactionConfirmationModal
-          visible={modalState.showConfirmation}
-          setVisible={(value) =>
-            handleSetModalState({ showConfirmation: value })
-          }
-          amount={amount / 100}
-          loading={paymentLoading}
-          bank={paymentState.bankOptions}
-          onChange={() => {
-            handleSetModalState({ showConfirmation: false });
-          }}
-          onPress={async () => {
-            await handlePayment({ isOneTap: true });
-            handleSetModalState({ showConfirmation: false });
-          }}
-        />
-      )}
+              handlePayment({
+                isOneTap: true,
+                payload: requestPayload,
+              });
+            }}
+            close={() => setModalState(undefined)}
+          />
+        )}
 
-      {paymentState.transactionStatus && modalState.showInitiated && (
-        <TransactionInitiatedModal
-          visible={modalState.showInitiated}
-          setVisible={(value) => handleSetModalState({ showInitiated: value })}
-          transactionStatus={paymentState.transactionStatus}
-          onDone={() => {
-            if (
-              paymentState.transactionStatus === TransactionStatus.COMPLETED
-            ) {
-              handleSetModalState({ showSuccess: true });
-            } else if (
-              paymentState.transactionStatus === TransactionStatus.FAILED
-            ) {
-              handleSetModalState({ showFailure: true });
-            }
-            handleSetModalState({ showInitiated: false });
-          }}
-        />
-      )}
+        {modalState === ModalState.keyExchange && (
+          <KeyExchangeConfirmationModal
+            onSubmit={signAndMakePaymentRequest}
+          />
+        )}
 
-      {transactionCompleted && modalState.showSuccess && (
-        <TransactionSuccessModal
-          visible={modalState.showSuccess}
-          setVisible={(value) => handleSetModalState({ showSuccess: value })}
-          hasTimeout={true}
-          amount={amount / 100}
-          onTimeout={() => {
-            handleSetModalState({ showSuccess: false });
-            onTransactionUpdate?.(paymentState.transactionStatus!);
-          }}
-          onReturn={() => {
-            handleSetModalState({ showSuccess: false });
-            onTransactionUpdate?.(paymentState.transactionStatus!);
-          }}
-        />
-      )}
+        {modalState === ModalState.confirmation && paymentState.bankOptions && (
+          <TransactionConfirmationModal
+            amount={amount / 100}
+            loading={paymentLoading}
+            bank={paymentState.bankOptions}
+            onChange={() => {
+              setModalState(undefined);
+            }}
+            onPress={async () => {
+              await handlePayment({ isOneTap: true });
+            }}
+          />
+        )}
 
-      {transactionFailed && modalState.showFailure && (
-        <TransactionFailedModal
-          visible={modalState.showFailure}
-          setVisible={(value) => handleSetModalState({ showFailure: value })}
-          amount={amount / 100}
-          loading={loadingState.retry}
-          onRetry={handleRetryPayment}
-          onTimeout={() => {
-            handleSetModalState({ showFailure: false });
-            onTransactionUpdate?.(paymentState.transactionStatus!);
-          }}
-        />
-      )}
+        {modalState === ModalState.initiated && paymentState.transactionStatus && (
+          <TransactionInitiatedModal
+            transactionStatus={paymentState.transactionStatus}
+            onDone={() => {
+              if (
+                paymentState.transactionStatus === TransactionStatus.COMPLETED
+              ) {
+                setModalState(ModalState.success);
+              } else if (
+                paymentState.transactionStatus === TransactionStatus.FAILED
+              ) {
+                setModalState(ModalState.failure);
+              }
+            }}
+          />
+        )}
+
+        {modalState === ModalState.success && transactionCompleted && (
+          <TransactionSuccessModal
+            hasTimeout={true}
+            amount={amount / 100}
+            onTimeout={() => {
+              setModalState(undefined);
+              onTransactionUpdate?.(paymentState.transactionStatus!);
+            }}
+            onReturn={() => {
+              setModalState(undefined);
+              onTransactionUpdate?.(paymentState.transactionStatus!);
+            }}
+          />
+        )}
+
+        {modalState === ModalState.failure && transactionFailed && (
+          <TransactionFailedModal
+            amount={amount / 100}
+            onRetry={handleRetryPayment}
+            onTimeout={() => {
+              setModalState(undefined);
+              onTransactionUpdate?.(paymentState.transactionStatus!);
+            }}
+          />
+        )}
+
+        {modalState === ModalState.loading && (
+          <ProgressModal />
+        )}
+      </MonaModal>
     </Column>
   );
 };

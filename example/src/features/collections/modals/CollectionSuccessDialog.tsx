@@ -14,14 +14,14 @@ import AppButton from '../../../components/AppButton';
 
 const CollectionSuccessDialog = ({
   visible,
-  setVisible,
+  onClose,
   loading,
   collection,
   bank,
   onSubmit,
 }: {
   visible: boolean;
-  setVisible: (visible: boolean) => void;
+  onClose: () => void;
   loading: boolean;
   collection: CollectionResponse & {
     merchantName: string;
@@ -31,7 +31,7 @@ const CollectionSuccessDialog = ({
   onSubmit?: () => void;
 }) => {
   return (
-    <MonaModal visible={visible} setVisible={setVisible}>
+    <MonaModal visible={visible} onClose={onClose}>
       <View style={styles.container}>
         <CircularAvatar
           style={styles.logo}

@@ -1,4 +1,5 @@
-import { PAYMENT_BASE_URL } from './config';
+import forge from 'node-forge';
+import React from 'react';
 import { Dimensions } from 'react-native';
 import ReactNativeCustomTabs, {
   CustomTabsActivityHeightResizeBehavior,
@@ -10,10 +11,9 @@ import ReactNativeCustomTabs, {
   ViewControllerModalPresentationStyle,
 } from 'react-native-custom-tabs';
 import { MMKV } from 'react-native-mmkv';
-import type { MerchantSettings, SavedPaymentOptions } from '../types';
+import type { MerchantSettings } from '../types';
+import { PAYMENT_BASE_URL } from './config';
 import { PaymentMethod } from './enums';
-import React from 'react';
-import forge from 'node-forge';
 import { defaultTheme } from './theme';
 
 export const generateSessionId = (length = 10): string => {
@@ -149,8 +149,8 @@ export const generateRequestCurl = (
     const isJson =
       headers !== undefined
         ? (headers as Record<string, any>)['Content-Type']?.includes(
-            'application/json'
-          )
+          'application/json'
+        )
         : false;
     const body = isJson
       ? JSON.stringify(JSON.parse(options.body as string), null, 2) // beautify JSON
@@ -159,26 +159,6 @@ export const generateRequestCurl = (
   }
 
   return curl.join(' \\\n  ');
-};
-
-let monaSdkState: {
-  savedPaymentOptions?: SavedPaymentOptions | null;
-  merchantSdk?: MerchantSettings | null;
-} = {};
-
-export const setMonaSdkState = (data: {
-  savedPaymentOptions?: SavedPaymentOptions | null;
-  merchantSdk?: MerchantSettings | null;
-}) => {
-  monaSdkState = { ...monaSdkState, ...data };
-};
-
-export const getMonaSdkState = () => {
-  return monaSdkState;
-};
-
-export const clearMonaSdkState = () => {
-  monaSdkState = {};
 };
 
 export const encryptRequestData = async (data: string) => {

@@ -1,129 +1,109 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
-import MonaModal from './MonaModal';
-import MonaButton from '../components/MonaButton';
-import CircularAvatar from '../components/CircularAvatar';
-import { PAYMENT_BASE_URL } from '../utils/config';
-import SizedBox from '../components/SizedBox';
-import type { BankOptions, ModalType, SavedPaymentOptions } from '../types';
-import BankOptionsTile from '../components/BankOptionsTile';
-import { PaymentMethod } from '../utils/enums';
 import {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  type ForwardedRef,
+  useState
 } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import BankOptionsTile from '../components/BankOptionsTile';
+import CircularAvatar from '../components/CircularAvatar';
+import BankIcon from '../components/icons/Bank';
+import DirectionsIcon from '../components/icons/Directions';
+import MonaButton from '../components/MonaButton';
+import SizedBox from '../components/SizedBox';
+import type { BankOptions, SavedPaymentOptions } from '../types';
+import { PAYMENT_BASE_URL } from '../utils/config';
+import { PaymentMethod } from '../utils/enums';
 import { launchSdkUrl } from '../utils/helpers';
 import { MonaColors } from '../utils/theme';
-import DirectionsIcon from '../components/icons/Directions';
-import BankIcon from '../components/icons/Bank';
 
-const CollectionAccountSelectionDialog = forwardRef(
-  (
-    {
-      loading,
-      savedPaymentOptions,
-      onSubmit,
-      accessRequestId,
-    }: {
-      loading: boolean;
-      savedPaymentOptions: SavedPaymentOptions | null;
-      accessRequestId: string;
-      onSubmit?: (bank: BankOptions) => void;
-    },
-    ref: ForwardedRef<ModalType>
-  ) => {
-    const [bank, setBank] = useState<BankOptions | null>(null);
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const open = () => {
-      setShowModal(true);
-    };
-    const close = () => {
-      setShowModal(false);
-    };
-    useImperativeHandle(ref, () => ({
-      open,
-      close,
-    }));
-    return (
-      <MonaModal visible={showModal} setVisible={setShowModal}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <CircularAvatar size={48} backgroundColor={'#3045FB1A'}>
-              <BankIcon
-                // source={require('../assets/bank.png')}
-                style={styles.headerLogo}
-              />
-            </CircularAvatar>
-            <DirectionsIcon
-              // source={require('../assets/directions.png')}
-              style={styles.directionsIcon}
-            />
-            <Image
-              source={require('../assets/logo.png')}
-              style={styles.logoImage}
-            />
-          </View>
-          <Text style={styles.title}>Select Payment Account</Text>
-          <Text style={styles.subtitle}>
-            There are the account you linked, select the ones you'd like to link
-            to NGdeals for repayments.
-          </Text>
-          {savedPaymentOptions?.bank != null &&
-            savedPaymentOptions?.bank.map((value) => {
-              //TODO: This is not advisable
-              //TODO: This is Implemented based on what they have Flutter
-              //TODO! Alert them on backend to creeat an endpoint specific to collection
-
-              if (
-                value.bankName!.toLowerCase().includes('opay') ||
-                value.bankName!.toLowerCase().includes('palm') ||
-                value.bankName!.toLowerCase().includes('kuda') ||
-                value.bankName!.toLowerCase().includes('monie')
-              ) {
-                return <View key={value.bankId} />;
-              }
-              return (
-                <View key={value.bankId}>
-                  <BankOptionsTile
-                    bank={value}
-                    isSelected={value.bankId === bank?.bankId}
-                    paymentMethod={PaymentMethod.SAVEDBANK}
-                    onPress={() => {
-                      setBank(value);
-                    }}
-                  />
-                  <SizedBox height={20} />
-                </View>
-              );
-            })}
-          <SizedBox height={10} />
-          <Pressable
-            onPress={async () => {
-              const url = `${PAYMENT_BASE_URL}/collections/enrollment?collectionId=${accessRequestId}`;
-              await launchSdkUrl(url);
-            }}
-            style={styles.addAccountButton}
-          >
-            <Image
-              source={require('../assets/add.png')}
-              style={styles.addIcon}
-            />
-            <Text style={styles.textButtonText}>Add Account</Text>
-          </Pressable>
-          <SizedBox height={10} />
-          <MonaButton
-            style={styles.button}
-            text="Approve debiting"
-            isLoading={loading}
-            enabled={bank !== null}
-            onPress={() => onSubmit?.(bank!)}
+const CollectionAccountSelectionDialog = (
+  {
+    loading,
+    savedPaymentOptions,
+    onSubmit,
+    accessRequestId,
+  }: {
+    loading: boolean;
+    savedPaymentOptions: SavedPaymentOptions | null;
+    accessRequestId: string;
+    onSubmit?: (bank: BankOptions) => void;
+  },
+) => {
+  const [bank, setBank] = useState<BankOptions | null>(null);
+  return (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <CircularAvatar size={48} backgroundColor={'#3045FB1A'}>
+          <BankIcon
+            // source={require('../assets/bank.png')}
+            style={styles.headerLogo}
           />
-        </View>
-      </MonaModal>
-    );
-  }
-);
+        </CircularAvatar>
+        <DirectionsIcon
+          // source={require('../assets/directions.png')}
+          style={styles.directionsIcon}
+        />
+        <Image
+          source={require('../assets/logo.png')}
+          style={styles.logoImage}
+        />
+      </View>
+      <Text style={styles.title}>Select Payment Account</Text>
+      <Text style={styles.subtitle}>
+        There are the account you linked, select the ones you'd like to link
+        to NGdeals for repayments.
+      </Text>
+      {savedPaymentOptions?.bank != null &&
+        savedPaymentOptions?.bank.map((value) => {
+          //TODO: This is not advisable
+          //TODO: This is Implemented based on what they have Flutter
+          //TODO! Alert them on backend to creeat an endpoint specific to collection
+
+          if (
+            value.bankName!.toLowerCase().includes('opay') ||
+            value.bankName!.toLowerCase().includes('palm') ||
+            value.bankName!.toLowerCase().includes('kuda') ||
+            value.bankName!.toLowerCase().includes('monie')
+          ) {
+            return <View key={value.bankId} />;
+          }
+          return (
+            <View key={value.bankId}>
+              <BankOptionsTile
+                bank={value}
+                isSelected={value.bankId === bank?.bankId}
+                paymentMethod={PaymentMethod.SAVEDBANK}
+                onPress={() => {
+                  setBank(value);
+                }}
+              />
+              <SizedBox height={20} />
+            </View>
+          );
+        })}
+      <SizedBox height={10} />
+      <Pressable
+        onPress={async () => {
+          const url = `${PAYMENT_BASE_URL}/collections/enrollment?collectionId=${accessRequestId}`;
+          await launchSdkUrl(url);
+        }}
+        style={styles.addAccountButton}
+      >
+        <Image
+          source={require('../assets/add.png')}
+          style={styles.addIcon}
+        />
+        <Text style={styles.textButtonText}>Add Account</Text>
+      </Pressable>
+      <SizedBox height={10} />
+      <MonaButton
+        style={styles.button}
+        text="Approve debiting"
+        isLoading={loading}
+        enabled={bank !== null}
+        onPress={() => onSubmit?.(bank!)}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

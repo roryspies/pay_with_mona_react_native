@@ -82,7 +82,7 @@ const CollectionScreen = () => {
       onSuccess: () => {
         setShowSuccess(true);
       },
-      onError: () => {},
+      onError: () => { },
     });
 
   const [scheduledFormData, setScheduledFormData] = useState<ScheduledFormData>(
@@ -345,7 +345,7 @@ const CollectionScreen = () => {
         {showCollectionSummary && collection && (
           <CollectionAutomationDialog
             visible={showCollectionSummary}
-            setVisible={setShowCollectionSummary}
+            onClose={() => setShowCollectionSummary(false)}
             loading={collectionLoading}
             collection={{
               ...collection,
@@ -367,7 +367,7 @@ const CollectionScreen = () => {
         {showSuccess && collection && (
           <CollectionSuccessDialog
             visible={showSuccess}
-            setVisible={setShowSuccess}
+            onClose={() => setShowSuccess(false)}
             loading={false}
             collection={{
               ...collection,

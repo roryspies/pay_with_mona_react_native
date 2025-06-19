@@ -1,92 +1,56 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
-import MonaModal from './MonaModal';
-import MonaButton from '../components/MonaButton';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import CircularAvatar from '../components/CircularAvatar';
-import { MonaColors } from '../utils/theme';
-import {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  type ForwardedRef,
-} from 'react';
-import type { ModalType } from '../types';
+import SvgSecuritySafe from '../components/icons/SecuritySafe';
+import MerchantLogo from '../components/MerchantLogo';
+import MonaButton from '../components/MonaButton';
+import { lighten, MonaColors } from '../utils/theme';
 
-const KeyExchangeConfirmationModal = forwardRef(
-  (
-    {
-      loading,
-      onSubmit,
-    }: {
-      loading: boolean;
-      onSubmit?: () => void;
-    },
-    ref: ForwardedRef<ModalType>
-  ) => {
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const open = () => {
-      setShowModal(true);
-    };
-    const close = () => {
-      setShowModal(false);
-    };
-    useImperativeHandle(ref, () => ({
-      open,
-      close,
-    }));
+const KeyExchangeConfirmationModal = (
+  {
+    onSubmit,
+  }: {
+    onSubmit?: () => void;
+  },
+) => {
 
-    return (
-      <MonaModal visible={showModal} setVisible={setShowModal}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <CircularAvatar backgroundColor={MonaColors.secondary} size={48}>
-              <Image
-                source={require('../assets/mona_logo.png')}
-                style={styles.headerLogo}
-              />
-            </CircularAvatar>
-            <Image
-              source={require('../assets/checkmark_container.png')}
-              style={{
-                width: 48,
-                height: 16,
-              }}
-            />
-            <Image
-              source={require('../assets/ng_deals_logo.png')}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 50,
-                resizeMode: 'cover',
-              }}
-            />
-          </View>
-          <Text style={styles.title}>One Last Thing!</Text>
-          <Text style={styles.subtitle}>
-            Set up biometrics for faster, one-tap{'\n'}payments — every time you
-            check out.
-          </Text>
-          <View style={styles.infoContainer}>
-            <Image
-              source={require('../assets/security_safe.png')}
-              style={styles.infoIcon}
-            />
-            <Text style={styles.infoText}>
-              This is to make sure that you are the only one who can authorize
-              payments.
-            </Text>
-          </View>
-          <MonaButton
-            style={styles.button}
-            text="Setup"
-            isLoading={loading}
-            onPress={() => onSubmit?.()}
+  return (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <CircularAvatar backgroundColor={MonaColors.secondary} size={48}>
+          <Image
+            source={require('../assets/mona_logo.png')}
+            style={styles.headerLogo}
           />
-        </View>
-      </MonaModal>
-    );
-  }
-);
+        </CircularAvatar>
+        <Image
+          source={require('../assets/checkmark_container.png')}
+          style={{
+            width: 48,
+            height: 16,
+          }}
+        />
+        <MerchantLogo />
+      </View>
+      <Text style={styles.title}>One Last Thing!</Text>
+      <Text style={styles.subtitle}>
+        Set up biometrics for faster, one-tap{'\n'}payments — every time you
+        check out.
+      </Text>
+      <View style={styles.infoContainer}>
+        <SvgSecuritySafe width={20} height={20} color={lighten(MonaColors.primary, 35)} />
+        <Text style={[styles.infoText, { color: lighten(MonaColors.primary, 35) }]}>
+          This is to make sure that you are the only one who can authorize
+          payments.
+        </Text>
+      </View>
+      <MonaButton
+        style={styles.button}
+        text="Setup"
+        onPress={onSubmit}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -145,7 +109,6 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#8E94F1',
     letterSpacing: -0.48,
     lineHeight: 16,
   },

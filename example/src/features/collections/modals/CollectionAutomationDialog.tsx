@@ -13,13 +13,13 @@ import { Colors } from '../../../constants/Color';
 
 const CollectionAutomationDialog = ({
   visible,
-  setVisible,
+  onClose,
   loading,
   collection,
   onSubmit,
 }: {
   visible: boolean;
-  setVisible: (visible: boolean) => void;
+  onClose: () => void;
   loading: boolean;
   collection: CollectionResponse & {
     merchantName: string;
@@ -28,7 +28,7 @@ const CollectionAutomationDialog = ({
   onSubmit?: () => void;
 }) => {
   return (
-    <MonaModal visible={visible} setVisible={setVisible}>
+    <MonaModal visible={visible} onClose={onClose}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <CircularAvatar size={48} backgroundColor={'#3045FB1A'}>
