@@ -99,10 +99,9 @@ const TransactionInitiatedModal = ({
     ].includes(transactionStatus);
 
     if (isProgressStatus) {
+      startInitialProgressAnimation();
       if (transactionStatus === TransactionStatus.PROGRESSUPDATE) {
         startShimmerAnimation();
-      } else {
-        startInitialProgressAnimation();
       }
     } else {
       startCompletionAnimation();
@@ -113,86 +112,6 @@ const TransactionInitiatedModal = ({
     startShimmerAnimation,
     transactionStatus,
   ]);
-
-  // useEffect(() => {
-  //   if (
-  //     [TransactionStatus.PROGRESSUPDATE, TransactionStatus.INITIATED].includes(
-  //       transactionStatus
-  //     )
-  //   ) {
-  //     if (transactionStatus === TransactionStatus.PROGRESSUPDATE) {
-  //       Animated.loop(
-  //         Animated.timing(shimmerAnim, {
-  //           toValue: 1,
-  //           duration: 1000,
-  //           useNativeDriver: false,
-  //         })
-  //       ).start();
-  //       return;
-  //     }
-  //     setShowProgressBar2(false);
-  //     Animated.timing(progressBar1AnimatedValue, {
-  //       toValue: 1,
-  //       duration: 100,
-  //       useNativeDriver: false,
-  //     }).start(() => {
-  //       Animated.timing(opacity, {
-  //         toValue: 1, // fully transparent
-  //         duration: 100,
-  //         useNativeDriver: false,
-  //       }).start(() => {
-  //         Animated.loop(
-  //           Animated.timing(shimmerAnim, {
-  //             toValue: 1,
-  //             duration: 1500,
-  //             useNativeDriver: false,
-  //           })
-  //         ).start();
-  //       });
-  //     });
-  //   } else {
-  //     progressBar1AnimatedValue.setValue(1);
-  //     opacity.setValue(1);
-  //     setShowProgressBar2(true);
-  //     Animated.timing(progressBar2AnimatedValue, {
-  //       toValue: 1,
-  //       duration: 1000,
-  //       useNativeDriver: false,
-  //     }).start(() => {
-  //       Animated.timing(opacity2, {
-  //         toValue: 1,
-  //         duration: 500,
-  //         useNativeDriver: false,
-  //       }).start(() => {
-  //         Animated.timing(progressBar3AnimatedValue, {
-  //           toValue: 1,
-  //           duration: 1000,
-  //           useNativeDriver: false,
-  //         }).start(() => {
-  //           onDone?.();
-  //         });
-  //       });
-  //     });
-  //   }
-
-  //   // Animated.loop(
-  //   //   Animated.timing(shimmerAnim, {
-  //   //     toValue: 1,
-  //   //     duration: 1100,
-  //   //     useNativeDriver: false,
-  //   //   })
-  //   // ).start();
-  //   return () => {
-  //     console.log('closing all animations');
-  //     progressBar1AnimatedValue.resetAnimation();
-  //     progressBar2AnimatedValue.resetAnimation();
-  //     progressBar3AnimatedValue.resetAnimation();
-  //     opacity.resetAnimation();
-  //     opacity2.resetAnimation();
-  //     shimmerAnim.resetAnimation();
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [transactionStatus]);
 
   return (
     <View style={styles.container}>

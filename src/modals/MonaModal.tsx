@@ -54,7 +54,6 @@ const MonaModal = ({
             const heightDifference = lastMeasuredHeight.current ? Math.abs(height - lastMeasuredHeight.current) : Infinity;
 
             if (heightDifference > 5) { // 5px threshold to avoid tiny changes
-              console.log('Measured height:', height, 'Previous:', lastMeasuredHeight.current);
               lastMeasuredHeight.current = height;
               setMeasuredHeight(height);
             }
@@ -71,20 +70,20 @@ const MonaModal = ({
     setHasAnimatedToMeasured(false);
     lastMeasuredHeight.current = null;
 
-    // Animate backdrop and content together
-    Animated.parallel([
-      Animated.timing(backdropOpacity, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.spring(animatedHeight, {
-        toValue: INITIAL_HEIGHT,
-        useNativeDriver: false,
-        speed: 12,
-        bounciness: 2,
-      })
-    ]).start(() => {
+    // Start backdrop fade immediately
+    Animated.timing(backdropOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+
+    // Animate modal content from bottom
+    Animated.spring(animatedHeight, {
+      toValue: INITIAL_HEIGHT,
+      useNativeDriver: false,
+      speed: 12,
+      bounciness: 2,
+    }).start(() => {
       setIsAnimating(false);
       // Measure after initial animation completes
       measureTimer.current = setTimeout(measureContent, 50);
@@ -100,6 +99,7 @@ const MonaModal = ({
       clearTimeout(measureTimer.current);
     }
 
+    // Animate backdrop and content together for closing
     Animated.parallel([
       Animated.timing(backdropOpacity, {
         toValue: 0,
@@ -159,7 +159,6 @@ const MonaModal = ({
     if (measuredHeight && internalVisible && !isAnimating && !hasAnimatedToMeasured) {
       const heightDifference = Math.abs(measuredHeight - INITIAL_HEIGHT);
 
-      console.log('Animating to height:', measuredHeight, 'Current initial:', INITIAL_HEIGHT);
       setHasAnimatedToMeasured(true);
 
       if (heightDifference > 30) {
@@ -183,12 +182,19 @@ const MonaModal = ({
   return (
     <Modal
       isVisible={true}
-      onBackdropPress={closeModal}
       avoidKeyboard={true}
       useNativeDriverForBackdrop={false}
       useNativeDriver={false}
       style={{ justifyContent: 'flex-end', margin: 0 }}
       deviceWidth={Dimensions.get('window').width}
+      animationIn={{
+        from: { opacity: 1 },
+        to: { opacity: 1 },
+      }}
+      animationOut={{
+        from: { opacity: 1 },
+        to: { opacity: 1 },
+      }}
       animationInTiming={0}
       animationOutTiming={0}
       backdropOpacity={0}
@@ -205,9 +211,7 @@ const MonaModal = ({
           }
         ]}
       >
-        <TouchableWithoutFeedback onPress={closeModal}>
-          <View style={StyleSheet.absoluteFillObject} />
-        </TouchableWithoutFeedback>
+        <View style={StyleSheet.absoluteFillObject} />
       </Animated.View>
 
       {/* Modal content */}
@@ -266,7 +270,6 @@ const ModalContent = ({
   children,
   hasCloseButton,
   onClose,
-  usePoweredByMona,
 }: Partial<MonaModalProps>) => {
   return (
     <>
@@ -289,11 +292,7 @@ const ModalContent = ({
       <View style={styles.bottomSheetContent}>
         {children}
         <Image
-          source={
-            usePoweredByMona
-              ? require('../assets/poweredbymona.png')
-              : require('../assets/securebymona.png')
-          }
+          source={require('../assets/poweredbymona.png')}
           style={styles.footerImage}
         />
       </View>

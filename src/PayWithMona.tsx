@@ -406,7 +406,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       <MonaModal
         visible={!!modalState}
         backgroundColor={modalState === ModalState.confirmation ? MonaColors.white : undefined}
-        usePoweredByMona={modalState === ModalState.confirmation}
         hasCloseButton={
           modalState === ModalState.keyExchange ||
           modalState === ModalState.confirmation
@@ -500,7 +499,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
             }}
           />
         )}
-
 
         {modalState === ModalState.failure && transactionFailed && (
           <TransactionFailedModal
