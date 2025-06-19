@@ -37,12 +37,7 @@ import {
 } from './utils/helpers';
 import { MonaColors } from './utils/theme';
 import { useMonaSdkStore } from './hooks/useMonaSdkStore';
-
-interface LoadingState {
-  main: boolean;
-  setup: boolean;
-  retry: boolean;
-}
+import ProgressModal from './modals/ProgressModal';
 
 interface PaymentState {
   paymentOptions: SavedPaymentOptions | null;
@@ -63,6 +58,7 @@ enum ModalState {
   success = 'success',
   failure = 'failure',
   confirmation = 'confirmation',
+  loading = 'loading',
 }
 
 const PayWithMona: React.FC<PayWithMonaProps> = ({
@@ -79,7 +75,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
   } = config;
   const entryTaskModalRef = useRef<EntryTaskModalRef>(null);
   const paymentMethodRef = useRef<PaymentMethod>(null);
-  const [paylod, setPayload] = useState({});
+  const [payload, setPayload] = useState({});
 
   const [modalState, setModalState] = useState<ModalState>();
   const [paymentState, setPaymentState] = useState<PaymentState>({
@@ -92,16 +88,22 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     transactionStatus: null,
     entryTask: null,
   });
-  const [loadingState, setLoadingState] = useState<LoadingState>({
-    main: false,
-    setup: false,
-    retry: false,
-  });
 
-  const handleSetLoadingState = useCallback(
-    (field: keyof LoadingState, value: LoadingState[keyof LoadingState]) => {
-      setLoadingState((prev) => ({ ...prev, [field]: value }));
-    },
+  const [mainLoading, setMainLoading] = useState<boolean>(false);
+  const startLoading = useCallback(
+    () => setModalState(ModalState.loading),
+    []
+  );
+  const startMainLoading = useCallback(
+    () => setMainLoading(true),
+    []
+  );
+  const stopLoading = useCallback(
+    () => setModalState((prev) => (prev === ModalState.loading ? undefined : prev)),
+    []
+  );
+  const stopMainLoading = useCallback(
+    () => setMainLoading(false),
     []
   );
 
@@ -123,14 +125,13 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     () => paymentState.transactionStatus === TransactionStatus.COMPLETED,
     [paymentState.transactionStatus]
   );
-
   const transactionFailed = useMemo(
     () => paymentState.transactionStatus === TransactionStatus.FAILED,
     [paymentState.transactionStatus]
   );
   const isLoading = useMemo(
-    () => Object.values(loadingState).some(Boolean),
-    [loadingState]
+    () => modalState === ModalState.loading || mainLoading,
+    [modalState, mainLoading]
   );
 
   useEffect(() => {
@@ -201,7 +202,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
   const handleAuthEventUpdate = useCallback(
     async (strongAuthToken: string, mainSessionId: string) => {
-      handleSetLoadingState('main', true);
+      startMainLoading();
       try {
         const response = await monaService.loginWithStrongAuth(
           strongAuthToken,
@@ -216,7 +217,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         console.log('🔥 SSE Error:', error);
         onError?.(error as Error);
       } finally {
-        handleSetLoadingState('main', false);
+        stopMainLoading();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,34 +226,34 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
   const signAndMakePaymentRequest = useCallback(async () => {
     try {
-      handleSetLoadingState('setup', true);
+      startLoading();
       await monaService.signAndCommitKeys({
         deviceAuth: paymentState.deviceAuth,
         message: 'Authorize set-up',
       });
       await validatePII();
       onAuthUpdate?.();
-      handleSetLoadingState('setup', false);
-      handleSetLoadingState('main', true);
+      stopLoading();
+      startMainLoading();
+
       if (paymentState.bankId && isSavedOptions) {
         setModalState(ModalState.confirmation);
       } else {
         setModalState(undefined);
       }
-      handleSetLoadingState('main', false);
     } catch (error) {
       console.log('🔥 SSE Error:', error);
       onError?.(error as Error);
     } finally {
-      handleSetLoadingState('setup', false);
-      handleSetLoadingState('main', false);
+      stopLoading();
+      stopMainLoading();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentState.bankId, isSavedOptions, paymentState.deviceAuth]);
 
   const handleRetryPayment = useCallback(async () => {
     try {
-      handleSetLoadingState('retry', true);
+      startLoading();
       handleSetPaymentState({
         paymentMethod: null,
         bankId: null,
@@ -260,14 +261,13 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       });
       await initializeEvent();
       setModalState(undefined);
-      handleSetLoadingState('retry', false);
     } catch (e) {
-      handleSetLoadingState('retry', false);
       onError?.(e as Error);
+    } finally {
+      stopLoading();
     }
   }, [
     onError,
-    handleSetLoadingState,
     handleSetPaymentState,
     initializeEvent,
   ]);
@@ -287,6 +287,10 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     handleCloseEventUpdate: () => validatePII(),
   });
 
+  if (paymentLoading && modalState !== ModalState.loading) {
+    setModalState(ModalState.loading);
+  }
+
   useEffect(() => {
     validatePII();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -303,7 +307,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
       // ✅ Clear sdk data
       useMonaSdkStore.getState().clearMonaSdkState();
       //Other clean ups
-      console.log('MPayWithMonayPage unmounted');
+      console.log('PayWithMonaPage unmounted');
     };
   }, []);
 
@@ -351,8 +355,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
     paymentState.bankOptions,
     paymentState.paymentMethod,
   ]);
-
-  console.log('Mona Sdk State: ', modalState, paymentState.transactionStatus);
 
   return (
     <Column style={styles.container}>
@@ -428,7 +430,7 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
                 const isEncrypted = paymentState.entryTask.encrypted;
                 const encryptedData = await encryptRequestData(data);
                 requestPayload = {
-                  ...paylod,
+                  ...payload,
                   [paymentState.entryTask.fieldName]: isEncrypted
                     ? encryptedData
                     : data,
@@ -449,7 +451,6 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
 
         {modalState === ModalState.keyExchange && (
           <KeyExchangeConfirmationModal
-            loading={loadingState.setup}
             onSubmit={signAndMakePaymentRequest}
           />
         )}
@@ -504,13 +505,16 @@ const PayWithMona: React.FC<PayWithMonaProps> = ({
         {modalState === ModalState.failure && transactionFailed && (
           <TransactionFailedModal
             amount={amount / 100}
-            loading={loadingState.retry}
             onRetry={handleRetryPayment}
             onTimeout={() => {
               setModalState(undefined);
               onTransactionUpdate?.(paymentState.transactionStatus!);
             }}
           />
+        )}
+
+        {modalState === ModalState.loading && (
+          <ProgressModal />
         )}
       </MonaModal>
     </Column>

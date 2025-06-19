@@ -8,10 +8,8 @@ import { useState } from 'react';
 
 const KeyExchangeConfirmationModal = (
   {
-    loading,
     onSubmit,
   }: {
-    loading: boolean;
     onSubmit?: () => void;
   },
 ) => {
@@ -67,7 +65,6 @@ const KeyExchangeConfirmationModal = (
       <MonaButton
         style={styles.button}
         text="Setup"
-        isLoading={loading}
         onPress={onSubmit}
       />
     </View>

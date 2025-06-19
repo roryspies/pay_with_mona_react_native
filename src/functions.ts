@@ -16,7 +16,6 @@ export const initialize = async (
     savedPaymentOptions: savedBankOptions,
   });
   const response = await monaService.initializeSdk();
-  console.log('Merchant SDK initialized:', response);
   useMonaSdkStore.getState().setMonaSdkState({ merchantSdk: response });
   const monaColors = getMerchantColors(response);
   setMonaColors(monaColors);

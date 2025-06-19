@@ -7,13 +7,11 @@ import { MonaColors } from '../../utils/theme';
 const TransactionFailedModal = ({
   amount,
   onRetry,
-  loading,
   hasTimeout = false,
   timeoutDuration = 10000,
   onTimeout,
 }: {
   amount: number;
-  loading?: boolean;
   hasTimeout?: boolean;
   timeoutDuration?: number;
   onRetry?: () => void;
@@ -45,7 +43,6 @@ const TransactionFailedModal = ({
       <MonaButton
         style={styles.button}
         text="Try Again"
-        isLoading={loading}
         onPress={() => {
           if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
