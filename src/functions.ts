@@ -46,13 +46,3 @@ export const validatePII = async ({
     middleName,
   });
 };
-
-export const setMerchantPaymentSettings = async (
-  currentSettings: string,
-  merchantApiKey: string
-) => {
-  return await monaService.updateMerchantPaymentSettings(
-    currentSettings,
-    merchantApiKey
-  );
-};

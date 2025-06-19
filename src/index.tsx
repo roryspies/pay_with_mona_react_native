@@ -1,5 +1,5 @@
 import BankOptionsTile from './components/BankOptionsTile';
-import { initialize, setMerchantPaymentSettings, validatePII } from './functions';
+import { initialize, validatePII } from './functions';
 import useCollections from './hooks/useCollections';
 import MonaModal from './modals/MonaModal';
 import PayWithMona from './PayWithMona';
@@ -8,7 +8,6 @@ import { isAuthenticated, signOut } from './utils/helpers';
 
 export const PayWithMonaSDK = {
   initialize,
-  setMerchantPaymentSettings,
   validatePII,
   isAuthenticated,
   signOut,

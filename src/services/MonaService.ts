@@ -58,27 +58,6 @@ class MonaService {
     }
   }
 
-  public async updateMerchantPaymentSettings(currentSettings: string, merchantApiKey: string) {
-    this.ensureInitialized();
-    const response = await this.api.put(
-      '/merchant/profile',
-      {
-        "transactionConfig": {
-          "successRateType": currentSettings,
-        }
-      },
-      {
-        headers: {
-          'x-api-key': merchantApiKey,
-        },
-      }
-    );
-
-    if (!response) {
-      throw new Error('Could not update merchant settings');
-    }
-  }
-
   /**
    * Authenticate with strong authentication token
    * @param strongAuthToken - The strong authentication token
