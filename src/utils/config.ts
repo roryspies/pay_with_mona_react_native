@@ -1,6 +1,6 @@
-export const BASE_URL = 'https://api.development.mona.ng';
+export const BASE_URL = 'https://api.staging.mona.ng';
 
-export const PAYMENT_BASE_URL = 'https://pay.development.mona.ng';
+export const PAYMENT_BASE_URL = 'https://pay.staging.mona.ng';
 
 export const FIREBASE_URL =
   'https://mona-money-default-rtdb.europe-west1.firebasedatabase.app';
